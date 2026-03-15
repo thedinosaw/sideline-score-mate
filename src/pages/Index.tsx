@@ -7,7 +7,8 @@ import { LiveScoreboard } from '@/components/LiveScoreboard';
 import { MatchDetails } from '@/components/MatchDetails';
 import { SetupModal } from '@/components/SetupModal';
 import { NewMatchDialog } from '@/components/NewMatchDialog';
-import { Timer, List, Save, Plus } from 'lucide-react';
+import { Timer, List, Save, Plus, History } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 type Tab = 'live' | 'details';
 
