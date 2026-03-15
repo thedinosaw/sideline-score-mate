@@ -20,6 +20,8 @@ interface LiveScoreboardProps {
   onEditTeamName: (team: TeamSide, name: string) => void;
   halfTimeAlert: boolean;
   onDismissHalfTime: () => void;
+  onStartSecondHalf: () => void;
+  onEndMatch: () => void;
 }
 
 export function LiveScoreboard({
