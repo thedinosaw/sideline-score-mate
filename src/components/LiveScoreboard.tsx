@@ -186,13 +186,13 @@ export function LiveScoreboard({
               setShowTimerControls(true);
             }
           }}
-          className="relative z-10 w-40 h-40 sm:w-48 sm:h-48 rounded-full border-[3px] border-border bg-background flex flex-col items-center justify-center active:scale-95 transition-transform"
+          className={`relative z-10 w-40 h-40 sm:w-48 sm:h-48 rounded-full border-[3px] ${isOvertime ? 'border-destructive' : 'border-border'} bg-background flex flex-col items-center justify-center active:scale-95 transition-transform`}
         >
           {/* Half indicator */}
-          <span className="text-xs font-bold text-muted-foreground tracking-widest mb-1">
-            {halfLabel} HALF
+          <span className={`text-xs font-bold tracking-widest mb-1 ${isOvertime ? 'text-destructive' : 'text-muted-foreground'}`}>
+            {isOvertime ? 'OVERTIME' : `${halfLabel} HALF`}
           </span>
-          <span className="text-4xl sm:text-5xl font-black text-foreground leading-none">
+          <span className={`text-4xl sm:text-5xl font-black leading-none ${isOvertime ? 'text-destructive' : 'text-foreground'}`}>
             {formatTime(displaySeconds)}
           </span>
           <span className="text-base text-muted-foreground mt-1">
