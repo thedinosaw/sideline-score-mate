@@ -26,12 +26,9 @@ const Index = () => {
   useWakeLock(match.timerRunning);
 
   const handleHalfTime = useCallback(() => {
-    // Pause timer
     updateMatch({ timerRunning: false, timerStartedAt: null, status: 'half_time' });
     setHalfTimeAlert(true);
-    // Vibrate
     if ('vibrate' in navigator) navigator.vibrate([300, 100, 300, 100, 300]);
-    // Try alarm sound
     try {
       const ctx = new AudioContext();
       const osc = ctx.createOscillator();
@@ -43,6 +40,27 @@ const Index = () => {
       osc.start();
       osc.stop(ctx.currentTime + 1.5);
     } catch {}
+  }, [updateMatch]);
+
+  const handleStartSecondHalf = useCallback(() => {
+    updateMatch({
+      firstHalfSeconds: displaySeconds,
+      currentHalf: 2,
+      currentTimerSeconds: 0,
+      timerRunning: true,
+      timerStartedAt: new Date().toISOString(),
+      status: 'live',
+    });
+    setHalfTimeAlert(false);
+  }, [updateMatch, displaySeconds]);
+
+  const handleEndMatch = useCallback(() => {
+    updateMatch({
+      timerRunning: false,
+      timerStartedAt: null,
+      status: 'finished',
+    });
+    setHalfTimeAlert(false);
   }, [updateMatch]);
 
   const handleTick = useCallback((seconds: number) => {
