@@ -5,6 +5,7 @@ import { useWakeLock } from '@/hooks/useWakeLock';
 import { TeamSide, Goal } from '@/types/match';
 import { LiveScoreboard } from '@/components/LiveScoreboard';
 import { MatchDetails } from '@/components/MatchDetails';
+import { MatchSummary } from '@/components/MatchSummary';
 import { SetupModal } from '@/components/SetupModal';
 import { NewMatchDialog } from '@/components/NewMatchDialog';
 import { Timer, List, Save, Plus, History } from 'lucide-react';
@@ -23,6 +24,7 @@ const Index = () => {
   const [tab, setTab] = useState<Tab>('live');
   const [halfTimeAlert, setHalfTimeAlert] = useState(false);
   const [showNewMatchDialog, setShowNewMatchDialog] = useState(false);
+  const [showSummary, setShowSummary] = useState(false);
 
   useWakeLock(match.timerRunning);
 
@@ -179,7 +181,10 @@ const Index = () => {
           Details
         </button>
         <button
-          onClick={saveResult}
+          onClick={() => {
+            saveResult();
+            setShowSummary(true);
+          }}
           className="flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-xs font-semibold text-muted-foreground active:text-foreground transition-colors"
         >
           <Save size={20} />
@@ -207,6 +212,10 @@ const Index = () => {
           onDiscardAndNew={() => { startNewMatch(true); setShowNewMatchDialog(false); }}
           onCancel={() => setShowNewMatchDialog(false)}
         />
+      )}
+
+      {showSummary && (
+        <MatchSummary match={match} onClose={() => setShowSummary(false)} />
       )}
     </div>
   );
