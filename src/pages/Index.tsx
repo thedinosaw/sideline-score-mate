@@ -29,7 +29,7 @@ const Index = () => {
   useWakeLock(match.timerRunning);
 
   const handleHalfTime = useCallback(() => {
-    updateMatch({ timerRunning: false, timerStartedAt: null, status: 'half_time' });
+    updateMatch({ status: 'half_time' });
     setHalfTimeAlert(true);
     if ('vibrate' in navigator) navigator.vibrate([300, 100, 300, 100, 300]);
     try {

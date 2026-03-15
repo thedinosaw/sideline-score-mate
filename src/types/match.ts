@@ -31,7 +31,7 @@ export interface Match {
 
 export const DEFAULT_HALF_DURATION = 30 * 60;
 
-export const HALF_DURATION_PRESETS = [10, 15, 20, 25, 30, 35, 40, 45];
+export const HALF_DURATION_PRESETS = [5, 10, 15, 20, 25, 30, 35, 40, 45];
 
 export function createNewMatch(): Match {
   return {
