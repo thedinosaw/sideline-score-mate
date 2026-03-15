@@ -38,18 +38,25 @@ export function useTimer({
 
     const startedAt = new Date(timerStartedAt).getTime();
     const baseSeconds = initialSeconds;
+    let lastReported = -1;
 
     const interval = setInterval(() => {
       const elapsed = Math.floor((Date.now() - startedAt) / 1000);
       const current = baseSeconds + elapsed;
       setDisplaySeconds(current);
-      onTick(current);
+
+      // Only call onTick once per second to reduce re-renders
+      if (current !== lastReported) {
+        lastReported = current;
+        // Save every 5 seconds for persistence
+        if (current % 5 === 0) onTick(current);
+      }
 
       if (!halfTimeTriggered.current && current >= halfDurationSeconds) {
         halfTimeTriggered.current = true;
         onHalfTime();
       }
-    }, 250); // Update 4x/sec for responsiveness
+    }, 250);
 
     return () => clearInterval(interval);
   }, [isRunning, timerStartedAt, initialSeconds, halfDurationSeconds, onHalfTime, onTick]);
