@@ -186,7 +186,7 @@ export function LiveScoreboard({
             {formatTime(displaySeconds)}
           </span>
           <span className="text-base text-muted-foreground mt-1">
-            ({formatTime(match.halfDurationSeconds)})
+            ({formatTime(match.currentHalf === 2 ? match.halfDurationSeconds * 2 : match.halfDurationSeconds)})
           </span>
           {!match.timerRunning && match.status === 'paused' && (
             <span className="text-xs text-muted-foreground mt-1">PAUSED</span>
