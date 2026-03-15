@@ -7,11 +7,13 @@ import { LiveScoreboard } from '@/components/LiveScoreboard';
 import { MatchDetails } from '@/components/MatchDetails';
 import { SetupModal } from '@/components/SetupModal';
 import { NewMatchDialog } from '@/components/NewMatchDialog';
-import { Timer, List, Save, Plus } from 'lucide-react';
+import { Timer, List, Save, Plus, History } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 type Tab = 'live' | 'details';
 
 const Index = () => {
+  const navigate = useNavigate();
   const {
     match, updateMatch, addGoal, updateGoal, deleteGoal,
     undoLastGoal, saveResult, startNewMatch, setupMatch,
@@ -177,6 +179,13 @@ const Index = () => {
         >
           <Save size={20} />
           Save
+        </button>
+        <button
+          onClick={() => navigate('/history')}
+          className="flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-xs font-semibold text-muted-foreground active:text-foreground transition-colors"
+        >
+          <History size={20} />
+          History
         </button>
         <button
           onClick={() => setShowNewMatchDialog(true)}

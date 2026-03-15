@@ -7,10 +7,12 @@ interface TimerControlsProps {
   isRunning: boolean;
   currentSeconds: number;
   halfDurationSeconds: number;
+  currentHalf: 1 | 2;
   onPauseResume: () => void;
   onReset: () => void;
   onEditTime: (seconds: number) => void;
   onEditDuration: (seconds: number) => void;
+  onStartSecondHalf: () => void;
   onClose: () => void;
 }
 
@@ -18,10 +20,12 @@ export function TimerControls({
   isRunning,
   currentSeconds,
   halfDurationSeconds,
+  currentHalf,
   onPauseResume,
   onReset,
   onEditTime,
   onEditDuration,
+  onStartSecondHalf,
   onClose,
 }: TimerControlsProps) {
   const [editingTime, setEditingTime] = useState(false);
@@ -127,6 +131,17 @@ export function TimerControls({
             >
               Half Duration ({formatTime(halfDurationSeconds)})
             </Button>
+            {currentHalf === 1 && (
+              <Button
+                onClick={() => {
+                  onStartSecondHalf();
+                  onClose();
+                }}
+                className="w-full h-12 bg-accent text-accent-foreground font-bold"
+              >
+                Start 2nd Half
+              </Button>
+            )}
             <Button
               variant="outline"
               onClick={onReset}

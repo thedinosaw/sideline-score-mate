@@ -239,6 +239,7 @@ export function LiveScoreboard({
           isRunning={match.timerRunning}
           currentSeconds={displaySeconds}
           halfDurationSeconds={match.halfDurationSeconds}
+          currentHalf={match.currentHalf}
           onPauseResume={() => {
             onPauseResume();
             setShowTimerControls(false);
@@ -252,6 +253,7 @@ export function LiveScoreboard({
             setShowTimerControls(false);
           }}
           onEditDuration={onEditDuration}
+          onStartSecondHalf={onStartSecondHalf}
           onClose={() => setShowTimerControls(false)}
         />
       )}
