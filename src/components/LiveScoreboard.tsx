@@ -68,6 +68,10 @@ export function LiveScoreboard({
   };
 
   const halfLabel = match.currentHalf === 1 ? '1ST' : '2ND';
+  const halfTarget = match.currentHalf === 2
+    ? match.halfDurationSeconds * 2
+    : match.halfDurationSeconds;
+  const isOvertime = displaySeconds >= halfTarget;
 
   return (
     <div className="relative flex flex-col h-full w-full overflow-hidden">
