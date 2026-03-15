@@ -61,16 +61,17 @@ const Index = () => {
   });
 
   const handleStartSecondHalf = useCallback(() => {
+    const secondHalfStart = Math.max(displaySeconds, match.halfDurationSeconds);
     updateMatch({
       firstHalfSeconds: displaySeconds,
       currentHalf: 2,
-      currentTimerSeconds: 0,
+      currentTimerSeconds: secondHalfStart,
       timerRunning: true,
       timerStartedAt: new Date().toISOString(),
       status: 'live',
     });
     setHalfTimeAlert(false);
-  }, [updateMatch, displaySeconds]);
+  }, [updateMatch, displaySeconds, match.halfDurationSeconds]);
 
   const handleEndMatch = useCallback(() => {
     updateMatch({
