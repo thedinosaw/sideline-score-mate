@@ -145,6 +145,8 @@ const Index = () => {
             onEditTeamName={handleEditTeamName}
             halfTimeAlert={halfTimeAlert}
             onDismissHalfTime={() => setHalfTimeAlert(false)}
+            onStartSecondHalf={handleStartSecondHalf}
+            onEndMatch={handleEndMatch}
           />
         ) : (
           <MatchDetails
