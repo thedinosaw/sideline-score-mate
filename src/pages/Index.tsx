@@ -5,6 +5,7 @@ import { useWakeLock } from '@/hooks/useWakeLock';
 import { TeamSide, Goal } from '@/types/match';
 import { LiveScoreboard } from '@/components/LiveScoreboard';
 import { MatchDetails } from '@/components/MatchDetails';
+import { MatchSummary } from '@/components/MatchSummary';
 import { SetupModal } from '@/components/SetupModal';
 import { NewMatchDialog } from '@/components/NewMatchDialog';
 import { Timer, List, Save, Plus, History } from 'lucide-react';
@@ -23,6 +24,7 @@ const Index = () => {
   const [tab, setTab] = useState<Tab>('live');
   const [halfTimeAlert, setHalfTimeAlert] = useState(false);
   const [showNewMatchDialog, setShowNewMatchDialog] = useState(false);
+  const [showSummary, setShowSummary] = useState(false);
 
   useWakeLock(match.timerRunning);
 
