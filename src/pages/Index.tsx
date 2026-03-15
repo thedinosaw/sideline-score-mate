@@ -213,6 +213,10 @@ const Index = () => {
           onCancel={() => setShowNewMatchDialog(false)}
         />
       )}
+
+      {showSummary && (
+        <MatchSummary match={match} onClose={() => setShowSummary(false)} />
+      )}
     </div>
   );
 };
