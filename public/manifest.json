@@ -1,0 +1,15 @@
+{
+  "name": "Simple Scorer",
+  "short_name": "Scorer",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#e8e0cc",
+  "theme_color": "#1a2744",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64",
+      "type": "image/x-icon"
+    }
+  ]
+}
