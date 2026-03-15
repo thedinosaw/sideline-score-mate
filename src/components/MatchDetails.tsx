@@ -47,8 +47,9 @@ export function MatchDetails({ match, onUpdateGoal, onDeleteGoal }: MatchDetails
                 <span className="flex-1 text-center text-lg font-medium text-foreground">
                   {goal.scorerName || '--'} ({goal.assistName || '--'})
                 </span>
-                <span className="w-16 text-center text-lg font-bold text-foreground">
+                <span className="w-20 text-center text-base font-bold text-foreground">
                   {formatTime(goal.goalTimeSeconds)}
+                  {goal.half && <span className="block text-xs text-muted-foreground">{goal.half === 1 ? '1st' : '2nd'}</span>}
                 </span>
               </button>
             ))
