@@ -58,7 +58,10 @@ export function formatTime(totalSeconds: number): string {
 }
 
 export function getTeamGoals(goals: Goal[], team: TeamSide): Goal[] {
-  return goals.filter(g => g.team === team).sort((a, b) => a.goalTimeSeconds - b.goalTimeSeconds);
+  return goals.filter(g => g.team === team).sort((a, b) => {
+    if (a.half !== b.half) return a.half - b.half;
+    return a.goalTimeSeconds - b.goalTimeSeconds;
+  });
 }
 
 export function getTeamScore(goals: Goal[], team: TeamSide): number {
