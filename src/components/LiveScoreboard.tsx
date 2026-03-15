@@ -175,7 +175,13 @@ export function LiveScoreboard({
         <div className="absolute left-0 right-0 h-[3px] bg-border" />
 
         <button
-          onClick={() => setShowTimerControls(true)}
+          onClick={() => {
+            if (match.status === 'not_started') {
+              onPauseResume();
+            } else {
+              setShowTimerControls(true);
+            }
+          }}
           className="relative z-10 w-40 h-40 sm:w-48 sm:h-48 rounded-full border-[3px] border-border bg-background flex flex-col items-center justify-center active:scale-95 transition-transform"
         >
           {/* Half indicator */}
