@@ -13,6 +13,7 @@ import { useNavigate } from 'react-router-dom';
 type Tab = 'live' | 'details';
 
 const Index = () => {
+  const navigate = useNavigate();
   const {
     match, updateMatch, addGoal, updateGoal, deleteGoal,
     undoLastGoal, saveResult, startNewMatch, setupMatch,
