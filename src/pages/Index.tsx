@@ -22,16 +22,12 @@ const Index = () => {
   const [halfTimeAlert, setHalfTimeAlert] = useState(false);
   const [showNewMatchDialog, setShowNewMatchDialog] = useState(false);
 
-  // Wake lock while timer is running
   useWakeLock(match.timerRunning);
 
   const handleHalfTime = useCallback(() => {
-    // Pause timer
     updateMatch({ timerRunning: false, timerStartedAt: null, status: 'half_time' });
     setHalfTimeAlert(true);
-    // Vibrate
     if ('vibrate' in navigator) navigator.vibrate([300, 100, 300, 100, 300]);
-    // Try alarm sound
     try {
       const ctx = new AudioContext();
       const osc = ctx.createOscillator();
@@ -46,7 +42,6 @@ const Index = () => {
   }, [updateMatch]);
 
   const handleTick = useCallback((seconds: number) => {
-    // We store periodic snapshots for persistence
     updateMatch({ currentTimerSeconds: seconds });
   }, [updateMatch]);
 
@@ -59,9 +54,29 @@ const Index = () => {
     onTick: handleTick,
   });
 
+  const handleStartSecondHalf = useCallback(() => {
+    updateMatch({
+      firstHalfSeconds: displaySeconds,
+      currentHalf: 2,
+      currentTimerSeconds: 0,
+      timerRunning: true,
+      timerStartedAt: new Date().toISOString(),
+      status: 'live',
+    });
+    setHalfTimeAlert(false);
+  }, [updateMatch, displaySeconds]);
+
+  const handleEndMatch = useCallback(() => {
+    updateMatch({
+      timerRunning: false,
+      timerStartedAt: null,
+      status: 'finished',
+    });
+    setHalfTimeAlert(false);
+  }, [updateMatch]);
+
   const handlePauseResume = useCallback(() => {
     if (match.timerRunning) {
-      // Pause: snapshot current time
       updateMatch({
         timerRunning: false,
         timerStartedAt: null,
@@ -69,7 +84,6 @@ const Index = () => {
         status: 'paused',
       });
     } else {
-      // Start/resume
       updateMatch({
         timerRunning: true,
         timerStartedAt: new Date().toISOString(),
@@ -111,7 +125,6 @@ const Index = () => {
 
   return (
     <div className="flex flex-col h-[100dvh] w-full bg-background overflow-hidden">
-      {/* Main content */}
       <div className="flex-1 min-h-0">
         {tab === 'live' ? (
           <LiveScoreboard
@@ -127,6 +140,8 @@ const Index = () => {
             onEditTeamName={handleEditTeamName}
             halfTimeAlert={halfTimeAlert}
             onDismissHalfTime={() => setHalfTimeAlert(false)}
+            onStartSecondHalf={handleStartSecondHalf}
+            onEndMatch={handleEndMatch}
           />
         ) : (
           <MatchDetails
@@ -137,7 +152,6 @@ const Index = () => {
         )}
       </div>
 
-      {/* Bottom nav */}
       <nav className="flex items-center justify-around bg-card border-t-2 border-border h-14 flex-shrink-0">
         <button
           onClick={() => setTab('live')}
@@ -173,7 +187,6 @@ const Index = () => {
         </button>
       </nav>
 
-      {/* New match dialog */}
       {showNewMatchDialog && (
         <NewMatchDialog
           onSaveAndNew={() => { startNewMatch(false); setShowNewMatchDialog(false); }}

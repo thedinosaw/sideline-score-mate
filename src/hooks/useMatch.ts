@@ -34,18 +34,20 @@ export function useMatch() {
   }, []);
 
   const addGoal = useCallback((team: TeamSide, currentTimerSeconds: number): Goal => {
+    const currentMatch = match;
     const goal: Goal = {
       id: crypto.randomUUID(),
       team,
       scorerName: '',
       assistName: '',
       goalTimeSeconds: currentTimerSeconds,
+      half: currentMatch.currentHalf,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
     setMatch(prev => ({ ...prev, goals: [...prev.goals, goal] }));
     return goal;
-  }, []);
+  }, [match]);
 
   const updateGoal = useCallback((goalId: string, updates: Partial<Goal>) => {
     setMatch(prev => ({
