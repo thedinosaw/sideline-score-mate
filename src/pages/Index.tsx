@@ -47,9 +47,13 @@ const Index = () => {
     updateMatch({ currentTimerSeconds: seconds });
   }, [updateMatch]);
 
+  const halfTarget = match.currentHalf === 2
+    ? match.halfDurationSeconds * 2
+    : match.halfDurationSeconds;
+
   const displaySeconds = useTimer({
     initialSeconds: match.currentTimerSeconds,
-    halfDurationSeconds: match.halfDurationSeconds,
+    halfDurationSeconds: halfTarget,
     isRunning: match.timerRunning,
     timerStartedAt: match.timerStartedAt,
     onHalfTime: handleHalfTime,
