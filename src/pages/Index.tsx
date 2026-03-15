@@ -42,26 +42,6 @@ const Index = () => {
     } catch {}
   }, [updateMatch]);
 
-  const handleStartSecondHalf = useCallback(() => {
-    updateMatch({
-      firstHalfSeconds: displaySeconds,
-      currentHalf: 2,
-      currentTimerSeconds: 0,
-      timerRunning: true,
-      timerStartedAt: new Date().toISOString(),
-      status: 'live',
-    });
-    setHalfTimeAlert(false);
-  }, [updateMatch, displaySeconds]);
-
-  const handleEndMatch = useCallback(() => {
-    updateMatch({
-      timerRunning: false,
-      timerStartedAt: null,
-      status: 'finished',
-    });
-    setHalfTimeAlert(false);
-  }, [updateMatch]);
 
   const handleTick = useCallback((seconds: number) => {
     // We store periodic snapshots for persistence
