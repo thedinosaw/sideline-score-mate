@@ -37,6 +37,8 @@ export function LiveScoreboard({
   onEditTeamName,
   halfTimeAlert,
   onDismissHalfTime,
+  onStartSecondHalf,
+  onEndMatch,
 }: LiveScoreboardProps) {
   const [showTimerControls, setShowTimerControls] = useState(false);
   const [pendingGoal, setPendingGoal] = useState<Goal | null>(null);
@@ -65,20 +67,49 @@ export function LiveScoreboard({
     }
   };
 
+  const halfLabel = match.currentHalf === 1 ? '1ST' : '2ND';
+
   return (
     <div className="relative flex flex-col h-full w-full overflow-hidden">
       {/* Half-time alert overlay */}
       {halfTimeAlert && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-foreground/60" onClick={onDismissHalfTime}>
           <div className="bg-background rounded-2xl p-8 mx-6 text-center space-y-4 shadow-lg" onClick={e => e.stopPropagation()}>
-            <p className="text-4xl font-black text-foreground">HALF TIME</p>
+            <p className="text-4xl font-black text-foreground">
+              {match.currentHalf === 1 ? 'HALF TIME' : 'FULL TIME'}
+            </p>
             <p className="text-lg text-muted-foreground">{formatTime(displaySeconds)}</p>
-            <button
-              onClick={onDismissHalfTime}
-              className="w-full h-14 rounded-xl bg-primary text-primary-foreground text-lg font-bold"
-            >
-              OK
-            </button>
+            {match.currentHalf === 1 ? (
+              <div className="space-y-3">
+                <button
+                  onClick={onStartSecondHalf}
+                  className="w-full h-14 rounded-xl bg-primary text-primary-foreground text-lg font-bold"
+                >
+                  Start 2nd Half
+                </button>
+                <button
+                  onClick={onDismissHalfTime}
+                  className="w-full h-12 rounded-xl bg-secondary text-secondary-foreground font-semibold"
+                >
+                  Dismiss
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <button
+                  onClick={onEndMatch}
+                  className="w-full h-14 rounded-xl bg-primary text-primary-foreground text-lg font-bold"
+                >
+                  End Match
+                </button>
+                <button
+                  onClick={onDismissHalfTime}
+                  className="w-full h-12 rounded-xl bg-secondary text-secondary-foreground font-semibold"
+                >
+                  Continue
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -108,7 +139,6 @@ export function LiveScoreboard({
 
       {/* TOP HALF */}
       <div className="flex-1 flex flex-col items-center justify-center relative px-4">
-        {/* Team name */}
         <button
           onClick={() => handleStartEditName('top')}
           className="text-xl sm:text-2xl font-semibold text-foreground truncate max-w-[80%] min-h-[2rem]"
@@ -116,7 +146,6 @@ export function LiveScoreboard({
           {match.topTeamName || <span className="text-muted-foreground italic">Home</span>}
         </button>
 
-        {/* Score + latest scorer row */}
         <div className="flex items-center gap-4 mt-2">
           <button
             onClick={() => handleAddGoal('top')}
@@ -131,7 +160,6 @@ export function LiveScoreboard({
           )}
         </div>
 
-        {/* Undo */}
         {topScore > 0 && (
           <button
             onClick={() => onUndoGoal('top')}
@@ -144,32 +172,36 @@ export function LiveScoreboard({
 
       {/* CENTER DIVIDER + TIMER */}
       <div className="relative flex items-center justify-center py-2">
-        {/* Horizontal line */}
         <div className="absolute left-0 right-0 h-[3px] bg-border" />
 
-        {/* Timer circle */}
         <button
           onClick={() => setShowTimerControls(true)}
           className="relative z-10 w-40 h-40 sm:w-48 sm:h-48 rounded-full border-[3px] border-border bg-background flex flex-col items-center justify-center active:scale-95 transition-transform"
         >
+          {/* Half indicator */}
+          <span className="text-xs font-bold text-muted-foreground tracking-widest mb-1">
+            {halfLabel} HALF
+          </span>
           <span className="text-4xl sm:text-5xl font-black text-foreground leading-none">
             {formatTime(displaySeconds)}
           </span>
           <span className="text-base text-muted-foreground mt-1">
             ({formatTime(match.halfDurationSeconds)})
           </span>
-          {!match.timerRunning && match.status !== 'not_started' && (
+          {!match.timerRunning && match.status === 'paused' && (
             <span className="text-xs text-muted-foreground mt-1">PAUSED</span>
           )}
           {match.status === 'not_started' && (
             <span className="text-xs text-muted-foreground mt-1">TAP TO START</span>
+          )}
+          {match.status === 'finished' && (
+            <span className="text-xs font-bold text-primary mt-1">FINISHED</span>
           )}
         </button>
       </div>
 
       {/* BOTTOM HALF */}
       <div className="flex-1 flex flex-col items-center justify-center relative px-4">
-        {/* Undo */}
         {bottomScore > 0 && (
           <button
             onClick={() => onUndoGoal('bottom')}
@@ -179,7 +211,6 @@ export function LiveScoreboard({
           </button>
         )}
 
-        {/* Score + latest scorer */}
         <div className="flex items-center gap-4">
           <button
             onClick={() => handleAddGoal('bottom')}
@@ -194,7 +225,6 @@ export function LiveScoreboard({
           )}
         </div>
 
-        {/* Team name */}
         <button
           onClick={() => handleStartEditName('bottom')}
           className="text-xl sm:text-2xl font-semibold text-foreground truncate max-w-[80%] mt-2 min-h-[2rem]"
