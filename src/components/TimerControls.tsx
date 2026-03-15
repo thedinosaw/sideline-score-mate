@@ -131,6 +131,17 @@ export function TimerControls({
             >
               Half Duration ({formatTime(halfDurationSeconds)})
             </Button>
+            {currentHalf === 1 && (
+              <Button
+                onClick={() => {
+                  onStartSecondHalf();
+                  onClose();
+                }}
+                className="w-full h-12 bg-accent text-accent-foreground font-bold"
+              >
+                Start 2nd Half
+              </Button>
+            )}
             <Button
               variant="outline"
               onClick={onReset}

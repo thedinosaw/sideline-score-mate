@@ -181,6 +181,13 @@ const Index = () => {
           Save
         </button>
         <button
+          onClick={() => navigate('/history')}
+          className="flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-xs font-semibold text-muted-foreground active:text-foreground transition-colors"
+        >
+          <History size={20} />
+          History
+        </button>
+        <button
           onClick={() => setShowNewMatchDialog(true)}
           className="flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-xs font-semibold text-muted-foreground active:text-foreground transition-colors"
         >
