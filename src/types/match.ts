@@ -1,6 +1,6 @@
 export type TeamSide = 'top' | 'bottom';
 
-export type MatchStatus = 'not_started' | 'live' | 'paused' | 'half_time' | 'finished';
+export type MatchStatus = 'not_started' | 'live' | 'paused' | 'half_time' | 'second_half' | 'finished';
 
 export interface Goal {
   id: string;
@@ -8,6 +8,7 @@ export interface Goal {
   scorerName: string;
   assistName: string;
   goalTimeSeconds: number;
+  half: 1 | 2;
   createdAt: string;
   updatedAt: string;
 }
@@ -21,12 +22,14 @@ export interface Match {
   halfDurationSeconds: number;
   currentTimerSeconds: number;
   timerRunning: boolean;
-  timerStartedAt: string | null; // ISO timestamp when timer was last started
+  timerStartedAt: string | null;
   status: MatchStatus;
+  currentHalf: 1 | 2;
+  firstHalfSeconds: number | null;
   goals: Goal[];
 }
 
-export const DEFAULT_HALF_DURATION = 30 * 60; // 30 minutes
+export const DEFAULT_HALF_DURATION = 30 * 60;
 
 export const HALF_DURATION_PRESETS = [10, 15, 20, 25, 30, 35, 40, 45];
 
@@ -42,6 +45,8 @@ export function createNewMatch(): Match {
     timerRunning: false,
     timerStartedAt: null,
     status: 'not_started',
+    currentHalf: 1,
+    firstHalfSeconds: null,
     goals: [],
   };
 }
