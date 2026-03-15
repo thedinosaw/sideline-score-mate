@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface UseTimerProps {
   initialSeconds: number;
@@ -19,47 +19,60 @@ export function useTimer({
 }: UseTimerProps) {
   const [displaySeconds, setDisplaySeconds] = useState(initialSeconds);
   const halfTimeTriggered = useRef(false);
-  const prevRunning = useRef(isRunning);
+  const baseSecondsRef = useRef(initialSeconds);
+  const onHalfTimeRef = useRef(onHalfTime);
+  const onTickRef = useRef(onTick);
+
+  // Keep callback refs fresh
+  onHalfTimeRef.current = onHalfTime;
+  onTickRef.current = onTick;
 
   // Reset half time trigger when timer is reset
   useEffect(() => {
     if (initialSeconds === 0) halfTimeTriggered.current = false;
   }, [initialSeconds]);
 
-  // When not running, sync display to initial
+  // When not running, sync display and base to initialSeconds
   useEffect(() => {
     if (!isRunning) {
       setDisplaySeconds(initialSeconds);
+      baseSecondsRef.current = initialSeconds;
     }
   }, [isRunning, initialSeconds]);
+
+  // Capture base seconds when timer starts
+  useEffect(() => {
+    if (isRunning && timerStartedAt) {
+      baseSecondsRef.current = initialSeconds;
+    }
+    // Only on start — intentionally excluding initialSeconds from deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isRunning, timerStartedAt]);
 
   useEffect(() => {
     if (!isRunning || !timerStartedAt) return;
 
     const startedAt = new Date(timerStartedAt).getTime();
-    const baseSeconds = initialSeconds;
     let lastReported = -1;
 
     const interval = setInterval(() => {
       const elapsed = Math.floor((Date.now() - startedAt) / 1000);
-      const current = baseSeconds + elapsed;
+      const current = baseSecondsRef.current + elapsed;
       setDisplaySeconds(current);
 
-      // Only call onTick once per second to reduce re-renders
       if (current !== lastReported) {
         lastReported = current;
-        // Save every 5 seconds for persistence
-        if (current % 5 === 0) onTick(current);
+        if (current % 5 === 0) onTickRef.current(current);
       }
 
       if (!halfTimeTriggered.current && current >= halfDurationSeconds) {
         halfTimeTriggered.current = true;
-        onHalfTime();
+        onHalfTimeRef.current();
       }
     }, 250);
 
     return () => clearInterval(interval);
-  }, [isRunning, timerStartedAt, initialSeconds, halfDurationSeconds, onHalfTime, onTick]);
+  }, [isRunning, timerStartedAt, halfDurationSeconds]);
 
   return displaySeconds;
 }
