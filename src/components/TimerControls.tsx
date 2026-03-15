@@ -7,10 +7,12 @@ interface TimerControlsProps {
   isRunning: boolean;
   currentSeconds: number;
   halfDurationSeconds: number;
+  currentHalf: 1 | 2;
   onPauseResume: () => void;
   onReset: () => void;
   onEditTime: (seconds: number) => void;
   onEditDuration: (seconds: number) => void;
+  onStartSecondHalf: () => void;
   onClose: () => void;
 }
 
