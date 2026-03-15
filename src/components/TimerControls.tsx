@@ -20,10 +20,12 @@ export function TimerControls({
   isRunning,
   currentSeconds,
   halfDurationSeconds,
+  currentHalf,
   onPauseResume,
   onReset,
   onEditTime,
   onEditDuration,
+  onStartSecondHalf,
   onClose,
 }: TimerControlsProps) {
   const [editingTime, setEditingTime] = useState(false);
