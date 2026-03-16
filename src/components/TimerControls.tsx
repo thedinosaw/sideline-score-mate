@@ -13,6 +13,7 @@ interface TimerControlsProps {
   onEditTime: (seconds: number) => void;
   onEditDuration: (seconds: number) => void;
   onStartSecondHalf: () => void;
+  onEndMatch: () => void;
   onClose: () => void;
 }
 

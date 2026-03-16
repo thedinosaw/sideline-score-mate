@@ -153,6 +153,12 @@ export function LiveScoreboard({
         <div className="flex items-center gap-4 mt-2">
           <button
             onClick={() => handleAddGoal('top')}
+            onContextMenu={(e) => {
+              e.preventDefault();
+              if (match.status !== 'not_started' && match.status !== 'finished') {
+                onEndMatch();
+              }
+            }}
             className="text-7xl sm:text-8xl font-black text-foreground leading-none select-none active:scale-95 transition-transform"
           >
             {topScore}
