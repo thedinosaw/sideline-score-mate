@@ -27,6 +27,7 @@ export function TimerControls({
   onEditTime,
   onEditDuration,
   onStartSecondHalf,
+  onEndMatch,
   onClose,
 }: TimerControlsProps) {
   const [editingTime, setEditingTime] = useState(false);
