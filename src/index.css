@@ -87,3 +87,7 @@
     -webkit-user-select: none;
   }
 }
+
+#lovable-badge {
+  display: none !important;
+}
