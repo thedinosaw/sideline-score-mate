@@ -120,8 +120,8 @@ const Index = () => {
   }, [updateMatch]);
 
   const handleAddGoal = useCallback((team: TeamSide): Goal => {
-    return addGoal(team, displaySeconds);
-  }, [addGoal, displaySeconds]);
+    return addGoal(team, displaySeconds, match.currentHalf);
+  }, [addGoal, displaySeconds, match.currentHalf]);
 
   const handleEditTeamName = useCallback((team: TeamSide, name: string) => {
     if (team === 'top') updateMatch({ topTeamName: name });
