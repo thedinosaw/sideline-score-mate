@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Match, getTeamScore, formatTime } from '@/types/match';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Trash2 } from 'lucide-react';
+import { MatchSummary } from '@/components/MatchSummary';
 
 const SAVED_MATCHES_KEY = 'simple-scorer-saved';
 
@@ -16,8 +17,10 @@ function loadSavedMatches(): Match[] {
 const History = () => {
   const navigate = useNavigate();
   const [matches, setMatches] = useState<Match[]>(loadSavedMatches);
+  const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
 
-  const handleDelete = (id: string) => {
+  const handleDelete = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
     const updated = matches.filter(m => m.id !== id);
     setMatches(updated);
     localStorage.setItem(SAVED_MATCHES_KEY, JSON.stringify(updated));
@@ -46,7 +49,11 @@ const History = () => {
             const bottomScore = getTeamScore(m.goals, 'bottom');
             const date = m.savedAt ? new Date(m.savedAt) : new Date(m.createdAt);
             return (
-              <div key={m.id} className="bg-card border-2 border-border rounded-xl p-4">
+              <div
+                key={m.id}
+                onClick={() => setSelectedMatch(m)}
+                className="bg-card border-2 border-border rounded-xl p-4 cursor-pointer active:bg-secondary transition-colors"
+              >
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
                     {/* Date */}
@@ -74,7 +81,7 @@ const History = () => {
                     </p>
                   </div>
                   <button
-                    onClick={() => handleDelete(m.id)}
+                    onClick={(e) => handleDelete(m.id, e)}
                     className="p-2 text-muted-foreground active:text-destructive rounded-lg"
                   >
                     <Trash2 size={18} />
@@ -85,6 +92,10 @@ const History = () => {
           })
         )}
       </div>
+
+      {selectedMatch && (
+        <MatchSummary match={selectedMatch} onClose={() => setSelectedMatch(null)} />
+      )}
     </div>
   );
 };

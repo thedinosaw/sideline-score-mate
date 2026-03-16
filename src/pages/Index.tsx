@@ -82,7 +82,9 @@ const Index = () => {
       status: 'finished',
     });
     setHalfTimeAlert(false);
-  }, [updateMatch]);
+    saveResult();
+    setShowSummary(true);
+  }, [updateMatch, saveResult]);
 
   const handlePauseResume = useCallback(() => {
     if (match.timerRunning) {

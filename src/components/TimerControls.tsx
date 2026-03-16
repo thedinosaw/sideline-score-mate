@@ -13,6 +13,7 @@ interface TimerControlsProps {
   onEditTime: (seconds: number) => void;
   onEditDuration: (seconds: number) => void;
   onStartSecondHalf: () => void;
+  onEndMatch: () => void;
   onClose: () => void;
 }
 
@@ -26,6 +27,7 @@ export function TimerControls({
   onEditTime,
   onEditDuration,
   onStartSecondHalf,
+  onEndMatch,
   onClose,
 }: TimerControlsProps) {
   const [editingTime, setEditingTime] = useState(false);
@@ -142,6 +144,15 @@ export function TimerControls({
                 Start 2nd Half
               </Button>
             )}
+            <Button
+              onClick={() => {
+                onEndMatch();
+                onClose();
+              }}
+              className="w-full h-12 bg-destructive text-destructive-foreground font-bold"
+            >
+              End Match
+            </Button>
             <Button
               variant="outline"
               onClick={onReset}
