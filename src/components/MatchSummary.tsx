@@ -35,21 +35,20 @@ export function MatchSummary({ match, onClose }: MatchSummaryProps) {
         <p className="text-center text-sm font-bold text-muted-foreground tracking-widest">MATCH SAVED</p>
 
         {/* Final score */}
-        <div className="text-center space-y-2">
-          <div className="flex items-center justify-center gap-6">
-            <p className="flex-1 text-right text-lg font-bold text-foreground truncate">{topName}</p>
-            <div className="flex flex-col items-center leading-none">
-              <p className="text-5xl font-black text-foreground">{topScore}</p>
-              <p className="text-3xl font-black text-foreground">–</p>
-              <p className="text-5xl font-black text-foreground">{bottomScore}</p>
-            </div>
-            <p className="flex-1 text-left text-lg font-bold text-foreground truncate">{bottomName}</p>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between px-2">
+            <p className="text-lg font-bold text-foreground truncate">{topName}</p>
+            <p className="text-4xl font-black text-foreground">{topScore}</p>
+          </div>
+          <div className="flex items-center justify-between px-2">
+            <p className="text-lg font-bold text-foreground truncate">{bottomName}</p>
+            <p className="text-4xl font-black text-foreground">{bottomScore}</p>
           </div>
           {winner && (
-            <p className="text-sm font-semibold text-primary">{winner} wins!</p>
+            <p className="text-center text-sm font-semibold text-primary">{winner} wins!</p>
           )}
           {!winner && totalGoals > 0 && (
-            <p className="text-sm font-semibold text-muted-foreground">Draw</p>
+            <p className="text-center text-sm font-semibold text-muted-foreground">Draw</p>
           )}
         </div>
 
