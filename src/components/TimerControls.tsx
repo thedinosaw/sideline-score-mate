@@ -145,6 +145,15 @@ export function TimerControls({
               </Button>
             )}
             <Button
+              onClick={() => {
+                onEndMatch();
+                onClose();
+              }}
+              className="w-full h-12 bg-destructive text-destructive-foreground font-bold"
+            >
+              End Match
+            </Button>
+            <Button
               variant="outline"
               onClick={onReset}
               className="w-full h-12 text-destructive border-border"

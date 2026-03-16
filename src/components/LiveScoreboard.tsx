@@ -270,6 +270,10 @@ export function LiveScoreboard({
           }}
           onEditDuration={onEditDuration}
           onStartSecondHalf={onStartSecondHalf}
+          onEndMatch={() => {
+            onEndMatch();
+            setShowTimerControls(false);
+          }}
           onClose={() => setShowTimerControls(false)}
         />
       )}
