@@ -8,7 +8,7 @@ import { MatchDetails } from '@/components/MatchDetails';
 import { MatchSummary } from '@/components/MatchSummary';
 import { SetupModal } from '@/components/SetupModal';
 import { NewMatchDialog } from '@/components/NewMatchDialog';
-import { Timer, List, Save, Plus, History } from 'lucide-react';
+import { BottomNav } from '@/components/BottomNav';
 import { useNavigate } from 'react-router-dom';
 
 type Tab = 'live' | 'details';
