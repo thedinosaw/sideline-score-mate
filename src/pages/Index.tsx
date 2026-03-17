@@ -79,6 +79,7 @@ const Index = () => {
     updateMatch({
       timerRunning: false,
       timerStartedAt: null,
+      currentTimerSeconds: displaySeconds,
       status: 'finished',
     });
     setHalfTimeAlert(false);
