@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Match, getTeamScore, formatTime } from '@/types/match';
-import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 import { MatchSummary } from '@/components/MatchSummary';
+import { BottomNav } from '@/components/BottomNav';
 
 const SAVED_MATCHES_KEY = 'simple-scorer-saved';
 
@@ -15,7 +15,6 @@ function loadSavedMatches(): Match[] {
 }
 
 const History = () => {
-  const navigate = useNavigate();
   const [matches, setMatches] = useState<Match[]>(loadSavedMatches);
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
 
@@ -30,9 +29,6 @@ const History = () => {
     <div className="flex flex-col h-[100dvh] w-full bg-background">
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3 border-b-2 border-border bg-card">
-        <button onClick={() => navigate('/')} className="p-2 -ml-2 active:bg-secondary rounded-lg">
-          <ArrowLeft size={22} className="text-foreground" />
-        </button>
         <h1 className="text-xl font-bold text-foreground">Saved Matches</h1>
       </div>
 
@@ -56,13 +52,11 @@ const History = () => {
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
-                    {/* Date */}
                     <p className="text-xs text-muted-foreground mb-2">
                       {date.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
                       {' · '}
                       {date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
                     </p>
-                    {/* Score line */}
                     <div className="flex items-center gap-3">
                       <span className="text-base font-semibold text-foreground truncate max-w-[35%]">
                         {m.topTeamName || 'Home'}
@@ -74,7 +68,6 @@ const History = () => {
                         {m.bottomTeamName || 'Away'}
                       </span>
                     </div>
-                    {/* Duration */}
                     <p className="text-xs text-muted-foreground mt-1">
                       Half: {formatTime(m.halfDurationSeconds)}
                       {m.goals.length > 0 && ` · ${m.goals.length} goal${m.goals.length !== 1 ? 's' : ''}`}
@@ -92,6 +85,8 @@ const History = () => {
           })
         )}
       </div>
+
+      <BottomNav />
 
       {selectedMatch && (
         <MatchSummary match={selectedMatch} onClose={() => setSelectedMatch(null)} />
