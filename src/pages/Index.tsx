@@ -164,50 +164,15 @@ const Index = () => {
         )}
       </div>
 
-      <nav className="flex items-center justify-around bg-card border-t-2 border-border h-14 flex-shrink-0">
-        <button
-          onClick={() => setTab('live')}
-          className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-xs font-semibold transition-colors ${
-            tab === 'live' ? 'text-foreground' : 'text-muted-foreground'
-          }`}
-        >
-          <Timer size={20} />
-          Live
-        </button>
-        <button
-          onClick={() => setTab('details')}
-          className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-xs font-semibold transition-colors ${
-            tab === 'details' ? 'text-foreground' : 'text-muted-foreground'
-          }`}
-        >
-          <List size={20} />
-          Details
-        </button>
-        <button
-          onClick={() => {
-            saveResult();
-            setShowSummary(true);
-          }}
-          className="flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-xs font-semibold text-muted-foreground active:text-foreground transition-colors"
-        >
-          <Save size={20} />
-          Save
-        </button>
-        <button
-          onClick={() => navigate('/history')}
-          className="flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-xs font-semibold text-muted-foreground active:text-foreground transition-colors"
-        >
-          <History size={20} />
-          History
-        </button>
-        <button
-          onClick={() => setShowNewMatchDialog(true)}
-          className="flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-xs font-semibold text-muted-foreground active:text-foreground transition-colors"
-        >
-          <Plus size={20} />
-          New
-        </button>
-      </nav>
+      <BottomNav
+        activeTab={tab}
+        onTabChange={setTab}
+        onSave={() => {
+          saveResult();
+          setShowSummary(true);
+        }}
+        onNewMatch={() => setShowNewMatchDialog(true)}
+      />
 
       {showNewMatchDialog && (
         <NewMatchDialog
