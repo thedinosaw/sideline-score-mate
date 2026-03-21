@@ -73,15 +73,28 @@ export function useMatch() {
     });
   }, []);
 
-  const saveResult = useCallback(() => {
-    const saved = { ...match, savedAt: new Date().toISOString(), status: 'finished' as const };
-    setMatch(saved);
-    try {
-      const existing = JSON.parse(localStorage.getItem(SAVED_MATCHES_KEY) || '[]');
-      existing.push(saved);
-      localStorage.setItem(SAVED_MATCHES_KEY, JSON.stringify(existing));
-    } catch {}
-  }, [match]);
+  const saveResult = useCallback((overrides: Partial<Match> = {}) => {
+    const savedAt = new Date().toISOString();
+
+    setMatch(prev => {
+      const saved: Match = {
+        ...prev,
+        ...overrides,
+        savedAt,
+        status: 'finished',
+        timerRunning: false,
+        timerStartedAt: null,
+      };
+
+      try {
+        const existing = JSON.parse(localStorage.getItem(SAVED_MATCHES_KEY) || '[]');
+        existing.push(saved);
+        localStorage.setItem(SAVED_MATCHES_KEY, JSON.stringify(existing));
+      } catch {}
+
+      return saved;
+    });
+  }, []);
 
   const startNewMatch = useCallback((discard: boolean) => {
     if (!discard) saveResult();
