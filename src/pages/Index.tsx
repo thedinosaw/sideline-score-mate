@@ -76,16 +76,10 @@ const Index = () => {
   }, [updateMatch, displaySeconds, match.halfDurationSeconds]);
 
   const handleEndMatch = useCallback(() => {
-    updateMatch({
-      timerRunning: false,
-      timerStartedAt: null,
-      currentTimerSeconds: displaySeconds,
-      status: 'finished',
-    });
+    saveResult({ currentTimerSeconds: displaySeconds });
     setHalfTimeAlert(false);
-    saveResult();
     setShowSummary(true);
-  }, [updateMatch, saveResult]);
+  }, [displaySeconds, saveResult]);
 
   const handlePauseResume = useCallback(() => {
     if (match.timerRunning) {
