@@ -2,15 +2,17 @@ import { useState, useCallback } from 'react';
 import {
   Match, Goal, TeamSide,
   formatTime, formatScorer, getLatestGoal, getTeamScore,
+  getPeriodLabel, getPeriodTarget,
 } from '@/types/match';
 import { GoalEntryModal } from '@/components/GoalEntryModal';
 import { TimerControls } from '@/components/TimerControls';
-import { Undo2 } from 'lucide-react';
+import { Undo2, Lock } from 'lucide-react';
 
 interface LiveScoreboardProps {
   match: Match;
   displaySeconds: number;
   onPauseResume: () => void;
+  onStop: () => void;
   onResetTimer: () => void;
   onEditTime: (seconds: number) => void;
   onEditDuration: (seconds: number) => void;
@@ -20,14 +22,16 @@ interface LiveScoreboardProps {
   onEditTeamName: (team: TeamSide, name: string) => void;
   halfTimeAlert: boolean;
   onDismissHalfTime: () => void;
-  onStartSecondHalf: () => void;
+  onStartNextPeriod: () => void;
   onEndMatch: () => void;
+  onLock: () => void;
 }
 
 export function LiveScoreboard({
   match,
   displaySeconds,
   onPauseResume,
+  onStop,
   onResetTimer,
   onEditTime,
   onEditDuration,
@@ -37,8 +41,9 @@ export function LiveScoreboard({
   onEditTeamName,
   halfTimeAlert,
   onDismissHalfTime,
-  onStartSecondHalf,
+  onStartNextPeriod,
   onEndMatch,
+  onLock,
 }: LiveScoreboardProps) {
   const [showTimerControls, setShowTimerControls] = useState(false);
   const [pendingGoal, setPendingGoal] = useState<Goal | null>(null);
@@ -67,29 +72,37 @@ export function LiveScoreboard({
     }
   };
 
-  const halfLabel = match.currentHalf === 1 ? '1ST' : '2ND';
-  const halfTarget = match.currentHalf === 2
-    ? match.halfDurationSeconds * 2
-    : match.halfDurationSeconds;
+  const halfLabel = getPeriodLabel(match.currentHalf, match.periodType);
+  const halfTarget = getPeriodTarget(match.currentHalf, match.halfDurationSeconds);
   const isOvertime = displaySeconds >= halfTarget;
+  const isLastPeriod = match.currentHalf >= match.totalPeriods;
+  const periodEndLabel = isLastPeriod ? 'FULL TIME' : `${halfLabel} TIME`;
 
   return (
     <div className="relative flex flex-col h-full w-full overflow-hidden">
+      {/* Lock button */}
+      {match.status !== 'not_started' && match.status !== 'finished' && (
+        <button
+          onClick={onLock}
+          className="absolute top-3 right-3 z-20 w-10 h-10 rounded-full bg-secondary flex items-center justify-center"
+        >
+          <Lock size={18} className="text-muted-foreground" />
+        </button>
+      )}
+
       {/* Half-time alert overlay */}
       {halfTimeAlert && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-foreground/60" onClick={onDismissHalfTime}>
           <div className="bg-background rounded-2xl p-8 mx-6 text-center space-y-4 shadow-lg" onClick={e => e.stopPropagation()}>
-            <p className="text-4xl font-black text-foreground">
-              {match.currentHalf === 1 ? 'HALF TIME' : 'FULL TIME'}
-            </p>
+            <p className="text-4xl font-black text-foreground">{periodEndLabel}</p>
             <p className="text-lg text-muted-foreground">{formatTime(displaySeconds)}</p>
-            {match.currentHalf === 1 ? (
+            {!isLastPeriod ? (
               <div className="space-y-3">
                 <button
-                  onClick={onStartSecondHalf}
+                  onClick={onStartNextPeriod}
                   className="w-full h-14 rounded-xl bg-primary text-primary-foreground text-lg font-bold"
                 >
-                  Start 2nd Half
+                  Start {getPeriodLabel(match.currentHalf + 1, match.periodType)}
                 </button>
                 <button
                   onClick={onDismissHalfTime}
@@ -153,12 +166,6 @@ export function LiveScoreboard({
         <div className="flex items-center gap-4 mt-2">
           <button
             onClick={() => handleAddGoal('top')}
-            onContextMenu={(e) => {
-              e.preventDefault();
-              if (match.status !== 'not_started' && match.status !== 'finished') {
-                onEndMatch();
-              }
-            }}
             className="text-7xl sm:text-8xl font-black text-foreground leading-none select-none active:scale-95 transition-transform"
           >
             {topScore}
@@ -194,15 +201,14 @@ export function LiveScoreboard({
           }}
           className={`relative z-10 w-40 h-40 sm:w-48 sm:h-48 rounded-full border-[3px] ${isOvertime ? 'border-destructive' : 'border-border'} bg-background flex flex-col items-center justify-center active:scale-95 transition-transform`}
         >
-          {/* Half indicator */}
           <span className={`text-xs font-bold tracking-widest mb-1 ${isOvertime ? 'text-destructive' : 'text-muted-foreground'}`}>
-            {isOvertime ? 'OVERTIME' : `${halfLabel} HALF`}
+            {isOvertime ? 'OVERTIME' : `${halfLabel} ${match.periodType === 'quarters' ? '' : 'HALF'}`}
           </span>
           <span className={`text-4xl sm:text-5xl font-black leading-none ${isOvertime ? 'text-destructive' : 'text-foreground'}`}>
             {formatTime(displaySeconds)}
           </span>
           <span className="text-base text-muted-foreground mt-1">
-            ({formatTime(match.currentHalf === 2 ? match.halfDurationSeconds * 2 : match.halfDurationSeconds)})
+            ({formatTime(halfTarget)})
           </span>
           {!match.timerRunning && match.status === 'paused' && (
             <span className="text-xs text-muted-foreground mt-1">PAUSED</span>
@@ -256,8 +262,14 @@ export function LiveScoreboard({
           currentSeconds={displaySeconds}
           halfDurationSeconds={match.halfDurationSeconds}
           currentHalf={match.currentHalf}
+          totalPeriods={match.totalPeriods}
+          periodType={match.periodType}
           onPauseResume={() => {
             onPauseResume();
+            setShowTimerControls(false);
+          }}
+          onStop={() => {
+            onStop();
             setShowTimerControls(false);
           }}
           onReset={() => {
@@ -269,7 +281,7 @@ export function LiveScoreboard({
             setShowTimerControls(false);
           }}
           onEditDuration={onEditDuration}
-          onStartSecondHalf={onStartSecondHalf}
+          onStartNextPeriod={onStartNextPeriod}
           onEndMatch={() => {
             onEndMatch();
             setShowTimerControls(false);

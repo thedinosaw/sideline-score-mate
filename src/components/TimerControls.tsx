@@ -1,18 +1,22 @@
 import { useState } from 'react';
-import { formatTime, HALF_DURATION_PRESETS } from '@/types/match';
+import { formatTime, HALF_DURATION_PRESETS, BREAK_DURATION_PRESETS, getPeriodLabel } from '@/types/match';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Square } from 'lucide-react';
 
 interface TimerControlsProps {
   isRunning: boolean;
   currentSeconds: number;
   halfDurationSeconds: number;
-  currentHalf: 1 | 2;
+  currentHalf: number;
+  totalPeriods: number;
+  periodType: 'halves' | 'quarters';
   onPauseResume: () => void;
+  onStop: () => void;
   onReset: () => void;
   onEditTime: (seconds: number) => void;
   onEditDuration: (seconds: number) => void;
-  onStartSecondHalf: () => void;
+  onStartNextPeriod: () => void;
   onEndMatch: () => void;
   onClose: () => void;
 }
@@ -22,11 +26,14 @@ export function TimerControls({
   currentSeconds,
   halfDurationSeconds,
   currentHalf,
+  totalPeriods,
+  periodType,
   onPauseResume,
+  onStop,
   onReset,
   onEditTime,
   onEditDuration,
-  onStartSecondHalf,
+  onStartNextPeriod,
   onEndMatch,
   onClose,
 }: TimerControlsProps) {
@@ -40,6 +47,9 @@ export function TimerControls({
     onEditTime(Math.max(0, total));
     setEditingTime(false);
   };
+
+  const periodLabel = periodType === 'halves' ? 'Half' : 'Quarter';
+  const canStartNext = currentHalf < totalPeriods;
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center" onClick={onClose}>
@@ -84,7 +94,7 @@ export function TimerControls({
           </div>
         ) : editingDuration ? (
           <div className="space-y-3">
-            <p className="text-sm text-muted-foreground text-center">Half duration (minutes)</p>
+            <p className="text-sm text-muted-foreground text-center">{periodLabel} duration (minutes)</p>
             <div className="flex flex-wrap justify-center gap-2">
               {HALF_DURATION_PRESETS.map(m => (
                 <button
@@ -115,6 +125,17 @@ export function TimerControls({
             >
               {isRunning ? 'Pause' : 'Resume'}
             </Button>
+            {isRunning && (
+              <Button
+                onClick={() => {
+                  onStop();
+                  onClose();
+                }}
+                className="w-full h-12 bg-destructive text-destructive-foreground font-bold flex items-center justify-center gap-2"
+              >
+                <Square size={18} /> Stop Timer
+              </Button>
+            )}
             <Button
               variant="outline"
               onClick={() => {
@@ -131,17 +152,17 @@ export function TimerControls({
               onClick={() => setEditingDuration(true)}
               className="w-full h-12 text-foreground border-border"
             >
-              Half Duration ({formatTime(halfDurationSeconds)})
+              {periodLabel} Duration ({formatTime(halfDurationSeconds)})
             </Button>
-            {currentHalf === 1 && (
+            {canStartNext && (
               <Button
                 onClick={() => {
-                  onStartSecondHalf();
+                  onStartNextPeriod();
                   onClose();
                 }}
                 className="w-full h-12 bg-accent text-accent-foreground font-bold"
               >
-                Start 2nd Half
+                Start {getPeriodLabel(currentHalf + 1, periodType)}
               </Button>
             )}
             <Button
