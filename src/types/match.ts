@@ -2,13 +2,17 @@ export type TeamSide = 'top' | 'bottom';
 
 export type MatchStatus = 'not_started' | 'live' | 'paused' | 'half_time' | 'second_half' | 'finished';
 
+export type PeriodType = 'halves' | 'quarters';
+
+export const BREAK_DURATION_PRESETS = [1, 3, 5, 10, 15];
+
 export interface Goal {
   id: string;
   team: TeamSide;
   scorerName: string;
   assistName: string;
   goalTimeSeconds: number;
-  half: 1 | 2;
+  half: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -24,9 +28,13 @@ export interface Match {
   timerRunning: boolean;
   timerStartedAt: string | null;
   status: MatchStatus;
-  currentHalf: 1 | 2;
+  currentHalf: number;
   firstHalfSeconds: number | null;
   goals: Goal[];
+  periodType: PeriodType;
+  totalPeriods: number;
+  breakDurationSeconds: number;
+  isLocked: boolean;
 }
 
 export const DEFAULT_HALF_DURATION = 30 * 60;
@@ -48,6 +56,10 @@ export function createNewMatch(): Match {
     currentHalf: 1,
     firstHalfSeconds: null,
     goals: [],
+    periodType: 'halves',
+    totalPeriods: 2,
+    breakDurationSeconds: 5 * 60,
+    isLocked: false,
   };
 }
 
@@ -78,4 +90,15 @@ export function formatScorer(goal: Goal | undefined): string {
   const scorer = goal.scorerName || '--';
   const assist = goal.assistName || '--';
   return `${scorer} (${assist})`;
+}
+
+export function getPeriodLabel(period: number, periodType: PeriodType): string {
+  if (periodType === 'quarters') {
+    return `Q${period}`;
+  }
+  return period === 1 ? '1ST' : '2ND';
+}
+
+export function getPeriodTarget(currentPeriod: number, periodDurationSeconds: number): number {
+  return currentPeriod * periodDurationSeconds;
 }
