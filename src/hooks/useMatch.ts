@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { Match, Goal, TeamSide, createNewMatch } from '@/types/match';
+import { Match, Goal, TeamSide, PeriodType, createNewMatch } from '@/types/match';
 
 const STORAGE_KEY = 'simple-scorer-match';
 const SAVED_MATCHES_KEY = 'simple-scorer-saved';
@@ -7,7 +7,15 @@ const SAVED_MATCHES_KEY = 'simple-scorer-saved';
 function loadMatch(): Match | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const m = JSON.parse(raw);
+      // Migration for old matches without new fields
+      if (!m.periodType) m.periodType = 'halves';
+      if (!m.totalPeriods) m.totalPeriods = 2;
+      if (m.breakDurationSeconds === undefined) m.breakDurationSeconds = 5 * 60;
+      if (m.isLocked === undefined) m.isLocked = false;
+      return m;
+    }
   } catch {}
   return null;
 }
@@ -33,7 +41,7 @@ export function useMatch() {
     setMatch(prev => ({ ...prev, ...updates }));
   }, []);
 
-  const addGoal = useCallback((team: TeamSide, currentTimerSeconds: number, currentHalf: 1 | 2): Goal => {
+  const addGoal = useCallback((team: TeamSide, currentTimerSeconds: number, currentHalf: number): Goal => {
     const goal: Goal = {
       id: crypto.randomUUID(),
       team,
@@ -103,12 +111,15 @@ export function useMatch() {
     setShowSetup(true);
   }, [saveResult]);
 
-  const setupMatch = useCallback((topName: string, bottomName: string, halfDuration: number) => {
+  const setupMatch = useCallback((topName: string, bottomName: string, halfDuration: number, periodType: PeriodType = 'halves', breakDuration: number = 5 * 60) => {
     setMatch(prev => ({
       ...prev,
       topTeamName: topName,
       bottomTeamName: bottomName,
       halfDurationSeconds: halfDuration,
+      periodType,
+      totalPeriods: periodType === 'halves' ? 2 : 4,
+      breakDurationSeconds: breakDuration,
       status: 'not_started',
     }));
     setShowSetup(false);

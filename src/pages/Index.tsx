@@ -2,13 +2,15 @@ import { useState, useCallback } from 'react';
 import { useMatch } from '@/hooks/useMatch';
 import { useTimer } from '@/hooks/useTimer';
 import { useWakeLock } from '@/hooks/useWakeLock';
-import { TeamSide, Goal } from '@/types/match';
+import { TeamSide, Goal, getPeriodTarget, getPeriodLabel } from '@/types/match';
 import { LiveScoreboard } from '@/components/LiveScoreboard';
 import { MatchDetails } from '@/components/MatchDetails';
 import { MatchSummary } from '@/components/MatchSummary';
 import { SetupModal } from '@/components/SetupModal';
 import { NewMatchDialog } from '@/components/NewMatchDialog';
 import { BottomNav } from '@/components/BottomNav';
+import { LockScreen } from '@/components/LockScreen';
+import { BreakTimer } from '@/components/BreakTimer';
 import { useNavigate } from 'react-router-dom';
 
 type Tab = 'live' | 'details';
@@ -25,6 +27,7 @@ const Index = () => {
   const [halfTimeAlert, setHalfTimeAlert] = useState(false);
   const [showNewMatchDialog, setShowNewMatchDialog] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
+  const [showBreakTimer, setShowBreakTimer] = useState(false);
 
   useWakeLock(match.timerRunning);
 
@@ -49,9 +52,7 @@ const Index = () => {
     updateMatch({ currentTimerSeconds: seconds });
   }, [updateMatch]);
 
-  const halfTarget = match.currentHalf === 2
-    ? match.halfDurationSeconds * 2
-    : match.halfDurationSeconds;
+  const halfTarget = getPeriodTarget(match.currentHalf, match.halfDurationSeconds);
 
   const displaySeconds = useTimer({
     initialSeconds: match.currentTimerSeconds,
@@ -62,18 +63,29 @@ const Index = () => {
     onTick: handleTick,
   });
 
-  const handleStartSecondHalf = useCallback(() => {
-    const secondHalfStart = Math.max(displaySeconds, match.halfDurationSeconds);
+  const handleStartNextPeriod = useCallback(() => {
+    const nextPeriod = match.currentHalf + 1;
+    const nextPeriodStart = getPeriodTarget(match.currentHalf, match.halfDurationSeconds);
+    const startSeconds = Math.max(displaySeconds, nextPeriodStart);
+    setHalfTimeAlert(false);
+    setShowBreakTimer(true);
+  }, [updateMatch, displaySeconds, match.halfDurationSeconds, match.currentHalf]);
+
+  const startNextPeriodNow = useCallback(() => {
+    const nextPeriod = match.currentHalf + 1;
+    const nextPeriodStart = getPeriodTarget(match.currentHalf, match.halfDurationSeconds);
+    const startSeconds = Math.max(displaySeconds, nextPeriodStart);
     updateMatch({
       firstHalfSeconds: displaySeconds,
-      currentHalf: 2,
-      currentTimerSeconds: secondHalfStart,
+      currentHalf: nextPeriod,
+      currentTimerSeconds: startSeconds,
       timerRunning: true,
       timerStartedAt: new Date().toISOString(),
       status: 'live',
     });
+    setShowBreakTimer(false);
     setHalfTimeAlert(false);
-  }, [updateMatch, displaySeconds, match.halfDurationSeconds]);
+  }, [updateMatch, displaySeconds, match.halfDurationSeconds, match.currentHalf]);
 
   const handleEndMatch = useCallback(() => {
     saveResult({ currentTimerSeconds: displaySeconds });
@@ -81,14 +93,18 @@ const Index = () => {
     setShowSummary(true);
   }, [displaySeconds, saveResult]);
 
+  const handleStop = useCallback(() => {
+    updateMatch({
+      timerRunning: false,
+      timerStartedAt: null,
+      currentTimerSeconds: displaySeconds,
+      status: 'paused',
+    });
+  }, [displaySeconds, updateMatch]);
+
   const handlePauseResume = useCallback(() => {
     if (match.timerRunning) {
-      updateMatch({
-        timerRunning: false,
-        timerStartedAt: null,
-        currentTimerSeconds: displaySeconds,
-        status: 'paused',
-      });
+      handleStop();
     } else {
       updateMatch({
         timerRunning: true,
@@ -97,7 +113,7 @@ const Index = () => {
         status: 'live',
       });
     }
-  }, [match.timerRunning, displaySeconds, updateMatch]);
+  }, [match.timerRunning, displaySeconds, updateMatch, handleStop]);
 
   const handleResetTimer = useCallback(() => {
     updateMatch({
@@ -125,8 +141,31 @@ const Index = () => {
     else updateMatch({ bottomTeamName: name });
   }, [updateMatch]);
 
+  const handleLock = useCallback(() => {
+    updateMatch({ isLocked: true });
+  }, [updateMatch]);
+
+  const handleUnlock = useCallback(() => {
+    updateMatch({ isLocked: false });
+  }, [updateMatch]);
+
+  if (match.isLocked) {
+    return <LockScreen onUnlock={handleUnlock} />;
+  }
+
   if (showSetup) {
     return <SetupModal onStart={setupMatch} />;
+  }
+
+  if (showBreakTimer) {
+    return (
+      <BreakTimer
+        initialSeconds={match.breakDurationSeconds}
+        periodLabel={getPeriodLabel(match.currentHalf, match.periodType)}
+        onComplete={startNextPeriodNow}
+        onSkip={startNextPeriodNow}
+      />
+    );
   }
 
   return (
@@ -137,6 +176,7 @@ const Index = () => {
             match={match}
             displaySeconds={displaySeconds}
             onPauseResume={handlePauseResume}
+            onStop={handleStop}
             onResetTimer={handleResetTimer}
             onEditTime={handleEditTime}
             onEditDuration={handleEditDuration}
@@ -146,8 +186,9 @@ const Index = () => {
             onEditTeamName={handleEditTeamName}
             halfTimeAlert={halfTimeAlert}
             onDismissHalfTime={() => setHalfTimeAlert(false)}
-            onStartSecondHalf={handleStartSecondHalf}
+            onStartNextPeriod={handleStartNextPeriod}
             onEndMatch={handleEndMatch}
+            onLock={handleLock}
           />
         ) : (
           <MatchDetails
