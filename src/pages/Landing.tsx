@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Timer, Trophy, ClipboardList, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -101,8 +101,13 @@ const Landing = () => {
       </section>
 
       {/* Footer */}
-      <footer className="mt-auto px-6 py-6 text-center text-xs text-muted-foreground border-t">
-        © {new Date().getFullYear()} Simple Scorer. Built for grassroots coaches.
+      <footer className="mt-auto px-6 py-6 text-center text-xs text-muted-foreground border-t space-y-2">
+        <div className="flex items-center justify-center gap-4">
+          <Link to="/privacy" className="hover:text-foreground transition-colors underline-offset-2 hover:underline">Privacy Policy</Link>
+          <span>·</span>
+          <Link to="/terms" className="hover:text-foreground transition-colors underline-offset-2 hover:underline">Terms of Use</Link>
+        </div>
+        <p>© {new Date().getFullYear()} Simple Soccer Scorer. Built for grassroots coaches.</p>
       </footer>
     </div>
   );
