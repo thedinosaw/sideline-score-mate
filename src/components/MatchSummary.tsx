@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { Match, Goal, formatTime, getTeamScore, getTeamGoals } from '@/types/match';
+import { Match, Goal, TeamSide, formatTime, getTeamScore, getTeamGoals } from '@/types/match';
 import { Button } from '@/components/ui/button';
 import { GoalEditModal } from '@/components/GoalEditModal';
-import { Pencil } from 'lucide-react';
+import { Pencil, Plus } from 'lucide-react';
 
 interface MatchSummaryProps {
   match: Match;
@@ -54,6 +54,22 @@ export function MatchSummary({ match, onClose, onUpdateMatch }: MatchSummaryProp
       goals: localMatch.goals.filter(g => g.id !== goalId),
     };
     applyUpdate(updated);
+  };
+
+  const handleAddGoal = (team: TeamSide) => {
+    const newGoal: Goal = {
+      id: crypto.randomUUID(),
+      team,
+      scorerName: '',
+      assistName: '',
+      goalTimeSeconds: 0,
+      half: 1,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    const updated = { ...localMatch, goals: [...localMatch.goals, newGoal] };
+    applyUpdate(updated);
+    setEditingGoal({ goal: newGoal, number: getTeamGoals(updated.goals, team).length });
   };
 
   const renderGoalList = (goals: Goal[], teamLabel: string) => {
@@ -136,10 +152,20 @@ export function MatchSummary({ match, onClose, onUpdateMatch }: MatchSummaryProp
           <div className="bg-card rounded-xl p-3 space-y-1">
             <p className="text-xs font-bold text-muted-foreground mb-2">{topName}</p>
             {renderGoalList(topGoals, topName)}
+            {editable && (
+              <button onClick={() => handleAddGoal('top')} className="flex items-center gap-1 text-xs text-primary font-semibold mt-2 active:opacity-70">
+                <Plus size={14} /> Add Goal
+              </button>
+            )}
           </div>
           <div className="bg-card rounded-xl p-3 space-y-1">
             <p className="text-xs font-bold text-muted-foreground mb-2">{bottomName}</p>
             {renderGoalList(bottomGoals, bottomName)}
+            {editable && (
+              <button onClick={() => handleAddGoal('bottom')} className="flex items-center gap-1 text-xs text-primary font-semibold mt-2 active:opacity-70">
+                <Plus size={14} /> Add Goal
+              </button>
+            )}
           </div>
         </div>
 
