@@ -14,6 +14,7 @@ export function BottomNav({ onSave, onNewMatch, activeTab, onTabChange, viewMode
   const navigate = useNavigate();
   const location = useLocation();
   const isHistory = location.pathname === '/history';
+  const appPath = '/app';
 
   return (
     <nav className="flex items-center justify-around bg-card border-t-2 border-border h-14 flex-shrink-0">
