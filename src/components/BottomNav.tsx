@@ -1,4 +1,4 @@
-import { Timer, List, Save, History, Plus } from 'lucide-react';
+import { Timer, List, Save, History, Plus, LayoutGrid } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 interface BottomNavProps {
@@ -6,9 +6,11 @@ interface BottomNavProps {
   onNewMatch?: () => void;
   activeTab?: 'live' | 'details';
   onTabChange?: (tab: 'live' | 'details') => void;
+  viewMode?: 'classic' | 'horizontal';
+  onToggleViewMode?: () => void;
 }
 
-export function BottomNav({ onSave, onNewMatch, activeTab, onTabChange }: BottomNavProps) {
+export function BottomNav({ onSave, onNewMatch, activeTab, onTabChange, viewMode, onToggleViewMode }: BottomNavProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const isHistory = location.pathname === '/history';
@@ -39,6 +41,15 @@ export function BottomNav({ onSave, onNewMatch, activeTab, onTabChange }: Bottom
         <List size={20} />
         Details
       </button>
+      {activeTab === 'live' && onToggleViewMode && (
+        <button
+          onClick={onToggleViewMode}
+          className="flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-xs font-semibold text-muted-foreground active:text-foreground transition-colors"
+        >
+          <LayoutGrid size={20} />
+          {viewMode === 'classic' ? 'Alt View' : 'Classic'}
+        </button>
+      )}
       <button
         onClick={() => {
           if (isHistory) navigate('/');
