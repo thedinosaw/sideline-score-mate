@@ -14,12 +14,13 @@ export function BottomNav({ onSave, onNewMatch, activeTab, onTabChange, viewMode
   const navigate = useNavigate();
   const location = useLocation();
   const isHistory = location.pathname === '/history';
+  const appPath = '/app';
 
   return (
     <nav className="flex items-center justify-around bg-card border-t-2 border-border h-14 flex-shrink-0">
       <button
         onClick={() => {
-          if (isHistory) navigate('/');
+          if (isHistory) navigate(appPath);
           onTabChange?.('live');
         }}
         className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-xs font-semibold transition-colors ${
@@ -31,7 +32,7 @@ export function BottomNav({ onSave, onNewMatch, activeTab, onTabChange, viewMode
       </button>
       <button
         onClick={() => {
-          if (isHistory) navigate('/');
+          if (isHistory) navigate(appPath);
           onTabChange?.('details');
         }}
         className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-xs font-semibold transition-colors ${
@@ -52,7 +53,7 @@ export function BottomNav({ onSave, onNewMatch, activeTab, onTabChange, viewMode
       )}
       <button
         onClick={() => {
-          if (isHistory) navigate('/');
+          if (isHistory) navigate(appPath);
           onSave?.();
         }}
         className="flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-xs font-semibold text-muted-foreground active:text-foreground transition-colors"
@@ -71,7 +72,7 @@ export function BottomNav({ onSave, onNewMatch, activeTab, onTabChange, viewMode
       </button>
       <button
         onClick={() => {
-          if (isHistory) navigate('/');
+          if (isHistory) navigate(appPath);
           onNewMatch?.();
         }}
         className="flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-xs font-semibold text-muted-foreground active:text-foreground transition-colors"
