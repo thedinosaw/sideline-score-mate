@@ -226,6 +226,12 @@ const Index = () => {
       <BottomNav
         activeTab={tab}
         onTabChange={setTab}
+        viewMode={viewMode}
+        onToggleViewMode={() => {
+          const next = viewMode === 'classic' ? 'horizontal' : 'classic';
+          setViewMode(next);
+          try { localStorage.setItem('scorer-view-mode', next); } catch {}
+        }}
         onSave={() => {
           saveResult();
           setShowSummary(true);
