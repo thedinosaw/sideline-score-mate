@@ -18,6 +18,13 @@ const History = () => {
   const [matches, setMatches] = useState<Match[]>(loadSavedMatches);
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
 
+  const handleUpdateSavedMatch = (updated: Match) => {
+    const newMatches = matches.map(m => m.id === updated.id ? updated : m);
+    setMatches(newMatches);
+    setSelectedMatch(updated);
+    localStorage.setItem(SAVED_MATCHES_KEY, JSON.stringify(newMatches));
+  };
+
   const handleDelete = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
     const updated = matches.filter(m => m.id !== id);
@@ -89,7 +96,11 @@ const History = () => {
       <BottomNav />
 
       {selectedMatch && (
-        <MatchSummary match={selectedMatch} onClose={() => setSelectedMatch(null)} />
+        <MatchSummary
+          match={selectedMatch}
+          onClose={() => setSelectedMatch(null)}
+          onUpdateMatch={handleUpdateSavedMatch}
+        />
       )}
     </div>
   );
