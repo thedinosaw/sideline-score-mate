@@ -96,7 +96,11 @@ const History = () => {
       <BottomNav />
 
       {selectedMatch && (
-        <MatchSummary match={selectedMatch} onClose={() => setSelectedMatch(null)} />
+        <MatchSummary
+          match={selectedMatch}
+          onClose={() => setSelectedMatch(null)}
+          onUpdateMatch={handleUpdateSavedMatch}
+        />
       )}
     </div>
   );
