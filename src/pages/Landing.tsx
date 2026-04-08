@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Timer, Trophy, ClipboardList, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import heroImg from '@/assets/hero-landing.jpg';
 
 const features = [
   {
@@ -33,14 +32,9 @@ const Landing = () => {
     <div className="min-h-[100dvh] bg-background text-foreground flex flex-col">
       {/* Hero */}
       <section className="relative overflow-hidden">
-        <img
-          src={heroImg}
-          alt="Grassroots football match"
-          className="absolute inset-0 w-full h-full object-cover opacity-30"
-        />
         <div className="relative z-10 flex flex-col items-center text-center px-6 py-16 sm:py-24 gap-6 max-w-2xl mx-auto">
           <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight">
-            Simple Scorer
+            Simple Soccer Scorer
           </h1>
           <p className="text-lg sm:text-xl text-muted-foreground max-w-md">
             The easiest sideline scoring &amp; timer app for grassroots football coaches.
