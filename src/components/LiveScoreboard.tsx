@@ -80,10 +80,12 @@ export function LiveScoreboard({
 
   return (
     <div className="relative flex flex-col h-full w-full overflow-hidden">
+      <h1 className="sr-only">Live Soccer Scoreboard</h1>
       {/* Lock button */}
       {match.status !== 'not_started' && match.status !== 'finished' && (
         <button
           onClick={onLock}
+          aria-label="Lock screen"
           className="absolute top-3 right-3 z-20 w-10 h-10 rounded-full bg-secondary flex items-center justify-center"
         >
           <Lock size={18} className="text-muted-foreground" />

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Match, getTeamScore, formatTime } from '@/types/match';
 import { Trash2 } from 'lucide-react';
 import { MatchSummary } from '@/components/MatchSummary';
@@ -34,13 +35,21 @@ const History = () => {
 
   return (
     <div className="flex flex-col h-[100dvh] w-full bg-background">
+      <Helmet>
+        <title>Match History – Simple Soccer Scorer</title>
+        <meta name="description" content="Review, edit, and manage your saved soccer match scores, goal timelines, and team stats — all stored locally on your device." />
+        <link rel="canonical" href="https://simplesoccerscorer.com/history" />
+        <meta property="og:title" content="Match History – Simple Soccer Scorer" />
+        <meta property="og:description" content="Review and edit your saved soccer matches with full goal timelines." />
+        <meta property="og:url" content="https://simplesoccerscorer.com/history" />
+      </Helmet>
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3 border-b-2 border-border bg-card">
         <h1 className="text-xl font-bold text-foreground">Saved Matches</h1>
       </div>
 
       {/* Match list */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+      <main className="flex-1 overflow-y-auto p-4 space-y-3">
         {matches.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
             <p className="text-lg font-semibold">No saved matches yet</p>
@@ -82,6 +91,7 @@ const History = () => {
                   </div>
                   <button
                     onClick={(e) => handleDelete(m.id, e)}
+                    aria-label={`Delete match ${m.topTeamName || 'Home'} vs ${m.bottomTeamName || 'Away'}`}
                     className="p-2 text-muted-foreground active:text-destructive rounded-lg"
                   >
                     <Trash2 size={18} />
@@ -91,7 +101,7 @@ const History = () => {
             );
           })
         )}
-      </div>
+      </main>
 
       <BottomNav />
 
