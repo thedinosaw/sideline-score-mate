@@ -14,6 +14,9 @@ function loadMatch(): Match | null {
       if (!m.totalPeriods) m.totalPeriods = 2;
       if (m.breakDurationSeconds === undefined) m.breakDurationSeconds = 5 * 60;
       if (m.isLocked === undefined) m.isLocked = false;
+      if (!Number.isFinite(m.halfDurationSeconds)) m.halfDurationSeconds = 25 * 60;
+      if (!Number.isFinite(m.currentHalf)) m.currentHalf = 1;
+      if (!Number.isFinite(m.currentTimerSeconds)) m.currentTimerSeconds = 0;
       return m;
     }
   } catch {}
