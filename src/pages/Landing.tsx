@@ -1,4 +1,5 @@
 import { useNavigate, Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { Timer, Trophy, ClipboardList, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -30,6 +31,15 @@ const Landing = () => {
 
   return (
     <div className="min-h-[100dvh] bg-background text-foreground flex flex-col">
+      <Helmet>
+        <title>Simple Soccer Scorer – Sideline Scoring for Grassroots Coaches</title>
+        <meta name="description" content="The easiest sideline scoring and timer app for grassroots football coaches. Track goals, halves, and quarters offline on iOS, Android, or the web." />
+        <link rel="canonical" href="https://simplesoccerscorer.com/" />
+        <meta property="og:title" content="Simple Soccer Scorer – Sideline Scoring for Grassroots Coaches" />
+        <meta property="og:description" content="Track soccer scores, goals, and match timers from the sideline. Free on web, iOS, and Android." />
+        <meta property="og:url" content="https://simplesoccerscorer.com/" />
+      </Helmet>
+      <main>
       {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="relative z-10 flex flex-col items-center text-center px-6 py-16 sm:py-24 gap-6 max-w-2xl mx-auto">
