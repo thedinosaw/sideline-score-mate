@@ -109,6 +109,9 @@ const Landing = () => {
           ))}
         </div>
       </section>
+      </main>
+
+
 
       {/* Footer */}
       <footer className="mt-auto px-6 py-6 text-center text-xs text-muted-foreground border-t space-y-2">
