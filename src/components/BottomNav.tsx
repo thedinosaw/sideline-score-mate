@@ -1,4 +1,4 @@
-import { Timer, List, Save, History, Plus } from 'lucide-react';
+import { Timer, List, Save, History, Plus, LayoutGrid } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 interface BottomNavProps {
@@ -6,18 +6,21 @@ interface BottomNavProps {
   onNewMatch?: () => void;
   activeTab?: 'live' | 'details';
   onTabChange?: (tab: 'live' | 'details') => void;
+  viewMode?: 'classic' | 'horizontal';
+  onToggleViewMode?: () => void;
 }
 
-export function BottomNav({ onSave, onNewMatch, activeTab, onTabChange }: BottomNavProps) {
+export function BottomNav({ onSave, onNewMatch, activeTab, onTabChange, viewMode, onToggleViewMode }: BottomNavProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const isHistory = location.pathname === '/history';
+  const appPath = '/app';
 
   return (
     <nav className="flex items-center justify-around bg-card border-t-2 border-border h-14 flex-shrink-0">
       <button
         onClick={() => {
-          if (isHistory) navigate('/');
+          if (isHistory) navigate(appPath);
           onTabChange?.('live');
         }}
         className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-xs font-semibold transition-colors ${
@@ -29,7 +32,7 @@ export function BottomNav({ onSave, onNewMatch, activeTab, onTabChange }: Bottom
       </button>
       <button
         onClick={() => {
-          if (isHistory) navigate('/');
+          if (isHistory) navigate(appPath);
           onTabChange?.('details');
         }}
         className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-xs font-semibold transition-colors ${
@@ -39,9 +42,18 @@ export function BottomNav({ onSave, onNewMatch, activeTab, onTabChange }: Bottom
         <List size={20} />
         Details
       </button>
+      {activeTab === 'live' && onToggleViewMode && (
+        <button
+          onClick={onToggleViewMode}
+          className="flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-xs font-semibold text-muted-foreground active:text-foreground transition-colors"
+        >
+          <LayoutGrid size={20} />
+          {viewMode === 'classic' ? 'Alt View' : 'Classic'}
+        </button>
+      )}
       <button
         onClick={() => {
-          if (isHistory) navigate('/');
+          if (isHistory) navigate(appPath);
           onSave?.();
         }}
         className="flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-xs font-semibold text-muted-foreground active:text-foreground transition-colors"
@@ -60,7 +72,7 @@ export function BottomNav({ onSave, onNewMatch, activeTab, onTabChange }: Bottom
       </button>
       <button
         onClick={() => {
-          if (isHistory) navigate('/');
+          if (isHistory) navigate(appPath);
           onNewMatch?.();
         }}
         className="flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-xs font-semibold text-muted-foreground active:text-foreground transition-colors"

@@ -13,11 +13,11 @@ const NotFound = () => {
   return (
     <div className="flex flex-col min-h-screen bg-muted">
       <div className="flex items-center gap-3 px-4 py-3 border-b-2 border-border bg-card">
-        <button onClick={() => navigate('/')} className="p-2 -ml-2 active:bg-secondary rounded-lg">
+        <button onClick={() => navigate('/')} aria-label="Go back to home" className="p-2 -ml-2 active:bg-secondary rounded-lg">
           <ArrowLeft size={22} className="text-foreground" />
         </button>
       </div>
-      <div className="flex-1 flex items-center justify-center">
+      <main className="flex-1 flex items-center justify-center">
         <div className="text-center">
           <h1 className="mb-4 text-4xl font-bold">404</h1>
           <p className="mb-4 text-xl text-muted-foreground">Oops! Page not found</p>
@@ -25,7 +25,7 @@ const NotFound = () => {
             Return to Home
           </button>
         </div>
-      </div>
+      </main>
     </div>
   );
 };

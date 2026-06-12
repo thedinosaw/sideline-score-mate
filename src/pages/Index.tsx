@@ -4,6 +4,7 @@ import { useTimer } from '@/hooks/useTimer';
 import { useWakeLock } from '@/hooks/useWakeLock';
 import { TeamSide, Goal, getPeriodTarget, getPeriodLabel } from '@/types/match';
 import { LiveScoreboard } from '@/components/LiveScoreboard';
+import { HorizontalScoreboard } from '@/components/HorizontalScoreboard';
 import { MatchDetails } from '@/components/MatchDetails';
 import { MatchSummary } from '@/components/MatchSummary';
 import { SetupModal } from '@/components/SetupModal';
@@ -24,6 +25,9 @@ const Index = () => {
   } = useMatch();
 
   const [tab, setTab] = useState<Tab>('live');
+  const [viewMode, setViewMode] = useState<'classic' | 'horizontal'>(() => {
+    try { return (localStorage.getItem('scorer-view-mode') as 'classic' | 'horizontal') || 'classic'; } catch { return 'classic'; }
+  });
   const [halfTimeAlert, setHalfTimeAlert] = useState(false);
   const [showNewMatchDialog, setShowNewMatchDialog] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
@@ -172,7 +176,8 @@ const Index = () => {
     <div className="flex flex-col h-[100dvh] w-full bg-background overflow-hidden">
       <div className="flex-1 min-h-0">
         {tab === 'live' ? (
-          <LiveScoreboard
+          viewMode === 'horizontal' ? (
+          <HorizontalScoreboard
             match={match}
             displaySeconds={displaySeconds}
             onPauseResume={handlePauseResume}
@@ -191,6 +196,25 @@ const Index = () => {
             onLock={handleLock}
           />
         ) : (
+          <LiveScoreboard
+            match={match}
+            displaySeconds={displaySeconds}
+            onPauseResume={handlePauseResume}
+            onStop={handleStop}
+            onResetTimer={handleResetTimer}
+            onEditTime={handleEditTime}
+            onEditDuration={handleEditDuration}
+            onAddGoal={handleAddGoal}
+            onUpdateGoal={(id, updates) => updateGoal(id, updates)}
+            onUndoGoal={undoLastGoal}
+            onEditTeamName={handleEditTeamName}
+            halfTimeAlert={halfTimeAlert}
+            onDismissHalfTime={() => setHalfTimeAlert(false)}
+            onStartNextPeriod={handleStartNextPeriod}
+            onEndMatch={handleEndMatch}
+            onLock={handleLock}
+          />
+        )) : (
           <MatchDetails
             match={match}
             onUpdateGoal={(id, updates) => updateGoal(id, updates)}
@@ -202,6 +226,12 @@ const Index = () => {
       <BottomNav
         activeTab={tab}
         onTabChange={setTab}
+        viewMode={viewMode}
+        onToggleViewMode={() => {
+          const next = viewMode === 'classic' ? 'horizontal' : 'classic';
+          setViewMode(next);
+          try { localStorage.setItem('scorer-view-mode', next); } catch {}
+        }}
         onSave={() => {
           saveResult();
           setShowSummary(true);

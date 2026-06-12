@@ -1,0 +1,13 @@
+# Simple Soccer Scorer
+
+> A free sideline scoring and match timer app for grassroots football (soccer) coaches. All match data is stored locally on the device — no accounts, no servers.
+
+Simple Soccer Scorer helps coaches track scores, goal scorers, assists, and match timings on the sideline. It supports halves or quarters, overtime, and a lock-screen mode for pocket-safe operation. The app works offline and is available on the web, Apple App Store, and Google Play.
+
+## Pages
+
+- [Home](/): Landing page with app features and store download links.
+- [Try the app](/app): Launch the live scoreboard and start a new match in the browser.
+- [Match History](/history): Review and edit previously saved matches.
+- [Privacy Policy](/privacy): How the app handles data — all storage is local to the device.
+- [Terms of Use](/terms): Terms governing use of the app.

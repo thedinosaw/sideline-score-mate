@@ -1,14 +1,14 @@
 import { useState, useCallback } from 'react';
 import {
   Match, Goal, TeamSide,
-  formatTime, formatScorer, getLatestGoal, getTeamScore,
+  formatTime, getTeamGoals, getTeamScore,
   getPeriodLabel, getPeriodTarget,
 } from '@/types/match';
 import { GoalEntryModal } from '@/components/GoalEntryModal';
 import { TimerControls } from '@/components/TimerControls';
 import { Undo2, Lock } from 'lucide-react';
 
-interface LiveScoreboardProps {
+interface HorizontalScoreboardProps {
   match: Match;
   displaySeconds: number;
   onPauseResume: () => void;
@@ -27,7 +27,11 @@ interface LiveScoreboardProps {
   onLock: () => void;
 }
 
-export function LiveScoreboard({
+function formatGoalMinute(seconds: number): string {
+  return `${Math.floor(seconds / 60)}'`;
+}
+
+export function HorizontalScoreboard({
   match,
   displaySeconds,
   onPauseResume,
@@ -44,7 +48,7 @@ export function LiveScoreboard({
   onStartNextPeriod,
   onEndMatch,
   onLock,
-}: LiveScoreboardProps) {
+}: HorizontalScoreboardProps) {
   const [showTimerControls, setShowTimerControls] = useState(false);
   const [pendingGoal, setPendingGoal] = useState<Goal | null>(null);
   const [editingTeam, setEditingTeam] = useState<TeamSide | null>(null);
@@ -52,8 +56,8 @@ export function LiveScoreboard({
 
   const topScore = getTeamScore(match.goals, 'top');
   const bottomScore = getTeamScore(match.goals, 'bottom');
-  const topLatest = getLatestGoal(match.goals, 'top');
-  const bottomLatest = getLatestGoal(match.goals, 'bottom');
+  const topGoals = getTeamGoals(match.goals, 'top');
+  const bottomGoals = getTeamGoals(match.goals, 'bottom');
 
   const handleAddGoal = useCallback((team: TeamSide) => {
     const goal = onAddGoal(team);
@@ -80,12 +84,10 @@ export function LiveScoreboard({
 
   return (
     <div className="relative flex flex-col h-full w-full overflow-hidden">
-      <h1 className="sr-only">Live Soccer Scoreboard</h1>
       {/* Lock button */}
       {match.status !== 'not_started' && match.status !== 'finished' && (
         <button
           onClick={onLock}
-          aria-label="Lock screen"
           className="absolute top-3 right-3 z-20 w-10 h-10 rounded-full bg-secondary flex items-center justify-center"
         >
           <Lock size={18} className="text-muted-foreground" />
@@ -100,33 +102,15 @@ export function LiveScoreboard({
             <p className="text-lg text-muted-foreground">{formatTime(displaySeconds)}</p>
             {!isLastPeriod ? (
               <div className="space-y-3">
-                <button
-                  onClick={onStartNextPeriod}
-                  className="w-full h-14 rounded-xl bg-primary text-primary-foreground text-lg font-bold"
-                >
+                <button onClick={onStartNextPeriod} className="w-full h-14 rounded-xl bg-primary text-primary-foreground text-lg font-bold">
                   Start {getPeriodLabel(match.currentHalf + 1, match.periodType)}
                 </button>
-                <button
-                  onClick={onDismissHalfTime}
-                  className="w-full h-12 rounded-xl bg-secondary text-secondary-foreground font-semibold"
-                >
-                  Dismiss
-                </button>
+                <button onClick={onDismissHalfTime} className="w-full h-12 rounded-xl bg-secondary text-secondary-foreground font-semibold">Dismiss</button>
               </div>
             ) : (
               <div className="space-y-3">
-                <button
-                  onClick={onEndMatch}
-                  className="w-full h-14 rounded-xl bg-primary text-primary-foreground text-lg font-bold"
-                >
-                  End Match
-                </button>
-                <button
-                  onClick={onDismissHalfTime}
-                  className="w-full h-12 rounded-xl bg-secondary text-secondary-foreground font-semibold"
-                >
-                  Continue
-                </button>
+                <button onClick={onEndMatch} className="w-full h-14 rounded-xl bg-primary text-primary-foreground text-lg font-bold">End Match</button>
+                <button onClick={onDismissHalfTime} className="w-full h-12 rounded-xl bg-secondary text-secondary-foreground font-semibold">Continue</button>
               </div>
             )}
           </div>
@@ -156,43 +140,8 @@ export function LiveScoreboard({
         </div>
       )}
 
-      {/* TOP HALF */}
-      <div className="flex-1 flex flex-col items-center justify-center relative px-4">
-        <button
-          onClick={() => handleStartEditName('top')}
-          className="text-xl sm:text-2xl font-semibold text-foreground truncate max-w-[80%] min-h-[2rem]"
-        >
-          {match.topTeamName || <span className="text-muted-foreground italic">Home</span>}
-        </button>
-
-        <div className="flex items-center gap-4 mt-2">
-          <button
-            onClick={() => handleAddGoal('top')}
-            className="text-7xl sm:text-8xl font-black text-foreground leading-none select-none active:scale-95 transition-transform"
-          >
-            {topScore}
-          </button>
-          {topLatest && (
-            <span className="text-base sm:text-lg text-muted-foreground font-medium max-w-[40vw] truncate">
-              {formatScorer(topLatest)}
-            </span>
-          )}
-        </div>
-
-        {topScore > 0 && (
-          <button
-            onClick={() => onUndoGoal('top')}
-            className="mt-2 flex items-center gap-1 text-sm text-muted-foreground active:text-foreground"
-          >
-            <Undo2 size={14} /> Undo
-          </button>
-        )}
-      </div>
-
-      {/* CENTER DIVIDER + TIMER */}
-      <div className="relative flex items-center justify-center py-2">
-        <div className="absolute left-0 right-0 h-[3px] bg-border" />
-
+      {/* TIMER BOX at top */}
+      <div className="px-4 pt-4 pb-2">
         <button
           onClick={() => {
             if (match.status === 'not_started') {
@@ -201,60 +150,118 @@ export function LiveScoreboard({
               setShowTimerControls(true);
             }
           }}
-          className={`relative z-10 w-40 h-40 sm:w-48 sm:h-48 rounded-full border-[3px] ${isOvertime ? 'border-destructive' : 'border-border'} bg-background flex flex-col items-center justify-center active:scale-95 transition-transform`}
+          className={`w-full rounded-2xl border-2 ${isOvertime ? 'border-destructive' : 'border-border'} bg-card py-3 px-4 flex flex-col items-center justify-center active:scale-[0.98] transition-transform`}
         >
-          <span className={`text-xs font-bold tracking-widest mb-1 ${isOvertime ? 'text-destructive' : 'text-muted-foreground'}`}>
+          <span className={`text-xs font-bold tracking-widest ${isOvertime ? 'text-destructive' : 'text-muted-foreground'}`}>
             {isOvertime ? 'OVERTIME' : `${halfLabel} ${match.periodType === 'quarters' ? '' : 'HALF'}`}
           </span>
-          <span className={`text-4xl sm:text-5xl font-black leading-none ${isOvertime ? 'text-destructive' : 'text-foreground'}`}>
+          <span className={`text-3xl sm:text-4xl font-black leading-none ${isOvertime ? 'text-destructive' : 'text-foreground'}`}>
             {formatTime(displaySeconds)}
           </span>
-          <span className="text-base text-muted-foreground mt-1">
-            ({formatTime(halfTarget)})
+          <span className="text-sm text-muted-foreground">
+            / {formatTime(halfTarget)}
           </span>
           {!match.timerRunning && match.status === 'paused' && (
-            <span className="text-xs text-muted-foreground mt-1">PAUSED</span>
+            <span className="text-xs text-muted-foreground mt-0.5">PAUSED</span>
           )}
           {match.status === 'not_started' && (
-            <span className="text-xs text-muted-foreground mt-1">TAP TO START</span>
+            <span className="text-xs text-muted-foreground mt-0.5">TAP TO START</span>
           )}
           {match.status === 'finished' && (
-            <span className="text-xs font-bold text-primary mt-1">FINISHED</span>
+            <span className="text-xs font-bold text-primary mt-0.5">FINISHED</span>
           )}
         </button>
       </div>
 
-      {/* BOTTOM HALF */}
-      <div className="flex-1 flex flex-col items-center justify-center relative px-4">
-        {bottomScore > 0 && (
+      {/* SCORE ROW: Home - Score - Away */}
+      <div className="flex items-center justify-center px-4 py-4 gap-2">
+        {/* Home team */}
+        <div className="flex-1 flex flex-col items-center min-w-0">
           <button
-            onClick={() => onUndoGoal('bottom')}
-            className="mb-2 flex items-center gap-1 text-sm text-muted-foreground active:text-foreground"
+            onClick={() => handleStartEditName('top')}
+            className="text-lg sm:text-xl font-bold text-foreground truncate max-w-full min-h-[1.5rem]"
           >
-            <Undo2 size={14} /> Undo
+            {match.topTeamName || <span className="text-muted-foreground italic">Home</span>}
           </button>
-        )}
+        </div>
 
-        <div className="flex items-center gap-4">
+        {/* Score */}
+        <div className="flex items-center gap-3 px-4">
+          <button
+            onClick={() => handleAddGoal('top')}
+            className="text-6xl sm:text-7xl font-black text-foreground leading-none select-none active:scale-95 transition-transform"
+          >
+            {topScore}
+          </button>
+          <span className="text-4xl sm:text-5xl font-light text-muted-foreground select-none">-</span>
           <button
             onClick={() => handleAddGoal('bottom')}
-            className="text-7xl sm:text-8xl font-black text-foreground leading-none select-none active:scale-95 transition-transform"
+            className="text-6xl sm:text-7xl font-black text-foreground leading-none select-none active:scale-95 transition-transform"
           >
             {bottomScore}
           </button>
-          {bottomLatest && (
-            <span className="text-base sm:text-lg text-muted-foreground font-medium max-w-[40vw] truncate">
-              {formatScorer(bottomLatest)}
-            </span>
-          )}
         </div>
 
-        <button
-          onClick={() => handleStartEditName('bottom')}
-          className="text-xl sm:text-2xl font-semibold text-foreground truncate max-w-[80%] mt-2 min-h-[2rem]"
-        >
-          {match.bottomTeamName || <span className="text-muted-foreground italic">Away</span>}
-        </button>
+        {/* Away team */}
+        <div className="flex-1 flex flex-col items-center min-w-0">
+          <button
+            onClick={() => handleStartEditName('bottom')}
+            className="text-lg sm:text-xl font-bold text-foreground truncate max-w-full min-h-[1.5rem]"
+          >
+            {match.bottomTeamName || <span className="text-muted-foreground italic">Away</span>}
+          </button>
+        </div>
+      </div>
+
+      {/* Undo buttons */}
+      <div className="flex justify-center gap-12 pb-2">
+        {topScore > 0 && (
+          <button onClick={() => onUndoGoal('top')} className="flex items-center gap-1 text-sm text-muted-foreground active:text-foreground">
+            <Undo2 size={14} /> Undo
+          </button>
+        )}
+        {bottomScore > 0 && (
+          <button onClick={() => onUndoGoal('bottom')} className="flex items-center gap-1 text-sm text-muted-foreground active:text-foreground">
+            <Undo2 size={14} /> Undo
+          </button>
+        )}
+      </div>
+
+      {/* Status label */}
+      <div className="text-center pb-2">
+        <span className="text-sm font-semibold text-muted-foreground">
+          {match.status === 'finished' ? 'Full time' : match.status === 'half_time' ? `${halfLabel} time` : match.status === 'paused' ? 'Paused' : match.status === 'not_started' ? 'Not started' : 'Live'}
+        </span>
+      </div>
+
+      {/* SCORERS */}
+      <div className="flex-1 min-h-0 overflow-y-auto px-4 pb-4">
+        <div className="flex gap-4">
+          {/* Home scorers */}
+          <div className="flex-1 flex flex-col items-end gap-1">
+            {topGoals.map(g => (
+              <span key={g.id} className="text-sm text-foreground">
+                {g.scorerName || '--'} <span className="text-muted-foreground">{formatGoalMinute(g.goalTimeSeconds)}</span>
+              </span>
+            ))}
+          </div>
+
+          {/* Divider with ball icon */}
+          <div className="flex flex-col items-center pt-0.5">
+            {(topGoals.length > 0 || bottomGoals.length > 0) && (
+              <span className="text-muted-foreground text-lg">⚽</span>
+            )}
+          </div>
+
+          {/* Away scorers */}
+          <div className="flex-1 flex flex-col items-start gap-1">
+            {bottomGoals.map(g => (
+              <span key={g.id} className="text-sm text-foreground">
+                {g.scorerName || '--'} <span className="text-muted-foreground">{formatGoalMinute(g.goalTimeSeconds)}</span>
+              </span>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Timer controls sheet */}
@@ -266,28 +273,13 @@ export function LiveScoreboard({
           currentHalf={match.currentHalf}
           totalPeriods={match.totalPeriods}
           periodType={match.periodType}
-          onPauseResume={() => {
-            onPauseResume();
-            setShowTimerControls(false);
-          }}
-          onStop={() => {
-            onStop();
-            setShowTimerControls(false);
-          }}
-          onReset={() => {
-            onResetTimer();
-            setShowTimerControls(false);
-          }}
-          onEditTime={(s) => {
-            onEditTime(s);
-            setShowTimerControls(false);
-          }}
+          onPauseResume={() => { onPauseResume(); setShowTimerControls(false); }}
+          onStop={() => { onStop(); setShowTimerControls(false); }}
+          onReset={() => { onResetTimer(); setShowTimerControls(false); }}
+          onEditTime={(s) => { onEditTime(s); setShowTimerControls(false); }}
           onEditDuration={onEditDuration}
           onStartNextPeriod={onStartNextPeriod}
-          onEndMatch={() => {
-            onEndMatch();
-            setShowTimerControls(false);
-          }}
+          onEndMatch={() => { onEndMatch(); setShowTimerControls(false); }}
           onClose={() => setShowTimerControls(false)}
         />
       )}
